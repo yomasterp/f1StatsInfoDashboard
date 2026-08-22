@@ -6,6 +6,7 @@ This document records standing project directions from the user. Review it befor
 
 - Work only in this repository.
 - Do not run Git commands other than `pull`, `fetch`, or commands that create a branch.
+- Before performing a commit, push, pull-request action, branch-protection change, or any other otherwise restricted Git or GitHub action, ask the user for explicit confirmation; perform it only after they approve.
 - Complete feature and fix work on a dedicated branch to track it through version control.
 - Use `feature/work_item` for feature branches.
 - Use `fix/work_item` for fix branches.

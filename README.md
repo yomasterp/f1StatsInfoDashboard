@@ -36,6 +36,7 @@ The database is the application’s canonical data store. Pages will query it ra
 | `npm run dev` | Start the Next.js development server. |
 | `npm run lint` | Run ESLint. |
 | `npm run typecheck` | Run TypeScript validation. |
+| `npm run fallow` | Analyze changed TypeScript and JavaScript for codebase-level risks. |
 | `npm test` | Run unit tests. |
 | `npm run test:integration` | Validate the applied local database migration. |
 | `npm run build` | Build the production app. |
@@ -46,5 +47,7 @@ The database is the application’s canonical data store. Pages will query it ra
 ## Current database foundation
 
 The initial migration creates `import_runs`, an audit log for ingestion attempts. It tracks the source, import scope, outcome, timing, record counts, and error details. Future schema branches will add normalized Formula 1 reference data and associate imported records with an import run.
+
+The reference-data migration adds normalized seasons, countries, circuits and configurations, driver and constructor identities with source-specific aliases, status codes, points systems, race formats, session types, and tire compounds. Future race, session, and results records will reference these canonical tables rather than source-specific names.
 
 No Formula 1 source data has been imported yet. The future Jolpica and FastF1 workers will be separate from the Next.js request lifecycle, rerunnable, rate-limited, and idempotent.

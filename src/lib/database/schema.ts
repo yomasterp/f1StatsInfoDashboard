@@ -87,6 +87,15 @@ export const statusCategory = pgEnum("status_category", [
   "unknown",
 ]);
 
+export const eventStatus = pgEnum("event_status", [
+  "scheduled",
+  "in_progress",
+  "completed",
+  "cancelled",
+  "postponed",
+  "not_held",
+]);
+
 /** A championship season, including seasons that are later cancelled or incomplete. */
 export const seasons = pgTable(
   "seasons",
@@ -434,6 +443,92 @@ export const tireCompounds = pgTable(
     check(
       "tire_compounds_surface_type",
       sql`NOT (${table.isSlick} AND ${table.isWet})`,
+    ),
+  ],
+);
+
+/** A championship event tied to the circuit layout and weekend format in use. */
+export const races = pgTable(
+  "races",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    seasonYear: integer("season_year")
+      .notNull()
+      .references(() => seasons.year, { onDelete: "restrict" }),
+    round: integer("round").notNull(),
+    slug: text("slug").notNull(),
+    officialName: text("official_name").notNull(),
+    circuitConfigurationId: integer("circuit_configuration_id")
+      .notNull()
+      .references(() => circuitConfigurations.id, { onDelete: "restrict" }),
+    raceFormatId: integer("race_format_id")
+      .notNull()
+      .references(() => raceFormats.id, { onDelete: "restrict" }),
+    weekendStartDate: date("weekend_start_date").notNull(),
+    weekendEndDate: date("weekend_end_date").notNull(),
+    scheduledStart: timestamp("scheduled_start", { withTimezone: true }),
+    status: eventStatus("status").notNull().default("scheduled"),
+    notes: text("notes"),
+  },
+  (table) => [
+    uniqueIndex("races_season_round_unique").on(table.seasonYear, table.round),
+    uniqueIndex("races_season_slug_unique").on(table.seasonYear, table.slug),
+    index("races_circuit_configuration_id_idx").on(table.circuitConfigurationId),
+    index("races_race_format_id_idx").on(table.raceFormatId),
+    index("races_status_scheduled_start_idx").on(
+      table.status,
+      table.scheduledStart,
+    ),
+    check("races_round_positive", sql`${table.round} > 0`),
+    check("races_slug_not_blank", hasNonBlankText(table.slug)),
+    check("races_official_name_not_blank", hasNonBlankText(table.officialName)),
+    check(
+      "races_weekend_date_range",
+      sql`${table.weekendStartDate} <= ${table.weekendEndDate}`,
+    ),
+  ],
+);
+
+/** A practice, qualifying, sprint, or race session within one race weekend. */
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    raceId: integer("race_id")
+      .notNull()
+      .references(() => races.id, { onDelete: "restrict" }),
+    sessionTypeId: integer("session_type_id")
+      .notNull()
+      .references(() => sessionTypes.id, { onDelete: "restrict" }),
+    sequence: integer("sequence").notNull(),
+    plannedStart: timestamp("planned_start", { withTimezone: true }),
+    actualStart: timestamp("actual_start", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    status: eventStatus("status").notNull().default("scheduled"),
+    scheduledLaps: integer("scheduled_laps"),
+    completedLaps: integer("completed_laps"),
+    notes: text("notes"),
+  },
+  (table) => [
+    uniqueIndex("sessions_race_session_type_unique").on(
+      table.raceId,
+      table.sessionTypeId,
+    ),
+    uniqueIndex("sessions_race_sequence_unique").on(table.raceId, table.sequence),
+    index("sessions_session_type_id_idx").on(table.sessionTypeId),
+    index("sessions_status_planned_start_idx").on(table.status, table.plannedStart),
+    check("sessions_sequence_non_negative", sql`${table.sequence} >= 0`),
+    check(
+      "sessions_scheduled_laps_positive",
+      sql`${table.scheduledLaps} IS NULL OR ${table.scheduledLaps} > 0`,
+    ),
+    check(
+      "sessions_completed_laps_non_negative",
+      sql`${table.completedLaps} IS NULL OR ${table.completedLaps} >= 0`,
+    ),
+    check(
+      "sessions_completion_after_start",
+      sql`${table.completedAt} IS NULL OR ${table.actualStart} IS NULL OR ${table.completedAt} >= ${table.actualStart}`,
     ),
   ],
 );

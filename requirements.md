@@ -27,11 +27,11 @@
 
 ### 2.1 Application stack
 
-- [ ] Use Next.js and TypeScript for the web application.
+- [x] Use Next.js and TypeScript for the web application.
   - Use the App Router and server-side data fetching where it improves page performance and searchability.
 - [ ] Use PostgreSQL as the canonical application database.
   - PostgreSQL must hold the normalized, queryable application dataset; the app must not depend on a public source API at page-render time.
-- [ ] Use a typed database layer and migrations.
+- [x] Use a typed database layer and migrations.
   - Select one ORM/query layer, such as Prisma or Drizzle, and use migrations to make the schema reproducible.
 - [ ] Use Zod or equivalent runtime validation for external data and API input.
 
@@ -44,7 +44,7 @@
 
 ### 2.3 Local development
 
-- [ ] Provide a documented local setup with environment variables and database startup instructions.
+- [x] Provide a documented local setup with environment variables and database startup instructions.
   - Required secrets and connection strings must never be committed to source control.
 - [ ] Use database seed/import commands that work on a clean local machine.
 
@@ -78,19 +78,19 @@
 
 ### 4.1 Reference data
 
-- [ ] Create `seasons`.
+- [x] Create `seasons`.
   - Stores season year, championship name, number of rounds, and any season-level notes.
-- [ ] Create `countries`.
+- [x] Create `countries`.
   - Normalizes host countries and driver/constructor nationalities.
-- [ ] Create `circuits` and `circuit_configurations`.
+- [x] Create `circuits` and `circuit_configurations`.
   - A circuit can have multiple historical layouts/configurations, so the layout used by a race must be identifiable.
-- [ ] Create `drivers`, `driver_aliases`, `constructors`, and `constructor_aliases`.
+- [x] Create `drivers`, `driver_aliases`, `constructors`, and `constructor_aliases`.
   - Canonical entities must not break when sources use alternate spellings, names, abbreviations, or renamed teams.
-- [ ] Create `status_codes`.
+- [x] Create `status_codes`.
   - Captures classifications and retirement reasons such as finished, lapped, accident, engine failure, disqualified, and did not start.
-- [ ] Create `points_systems` and `race_formats`.
+- [x] Create `points_systems` and `race_formats`.
   - Championship scoring and weekend formats changed over time, so neither may be hard-coded.
-- [ ] Create `session_types` and `tire_compounds`.
+- [x] Create `session_types` and `tire_compounds`.
   - These standardize practice, qualifying, sprint, race, and tire naming across imports.
 
 ### 4.2 Race-weekend structure

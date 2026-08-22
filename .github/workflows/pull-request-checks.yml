@@ -54,7 +54,7 @@ jobs:
         run: npm ci
 
       - name: Analyze changed TypeScript and JavaScript
-        run: npm run fallow -- --base "${{ github.event.pull_request.base.sha }}" --format github-annotations
+        run: npm run fallow -- --base "${{ github.event.pull_request.base.sha }}"
 
       - name: Run ESLint
         run: npm run lint

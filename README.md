@@ -50,4 +50,6 @@ The initial migration creates `import_runs`, an audit log for ingestion attempts
 
 The reference-data migration adds normalized seasons, countries, circuits and configurations, driver and constructor identities with source-specific aliases, status codes, points systems, race formats, session types, and tire compounds. Future race, session, and results records will reference these canonical tables rather than source-specific names.
 
+The race-weekend migration adds races and sessions. Races identify the season, round, circuit configuration, weekend format, dates, scheduled start, and lifecycle state. Sessions independently track their type, weekend order, planned and actual timing, completion, lap counts, and lifecycle state so postponed or cancelled sessions do not have to be inferred from race-level data.
+
 No Formula 1 source data has been imported yet. The future Jolpica and FastF1 workers will be separate from the Next.js request lifecycle, rerunnable, rate-limited, and idempotent.

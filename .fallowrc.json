@@ -1,0 +1,7 @@
+{
+  "$schema": "./node_modules/fallow/schema.json",
+  "entry": ["src/lib/database/client.ts"],
+  "rules": {
+    "dev-dependencies-in-production": "off"
+  }
+}

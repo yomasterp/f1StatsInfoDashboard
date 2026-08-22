@@ -1,0 +1,21 @@
+# dependencies
+/node_modules
+/.npm-cache
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+
+# local environment files
+.env*
+!.env.example
+
+# test and tool output
+/coverage
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -15,4 +15,5 @@ This document records standing project directions from the user. Review it befor
 
 - Read `requirements.md` before project work.
 - Tackle requirements in order, using requirement-aligned branch names.
+- Mark a requirement complete only after its pull request has been merged and closed; do not mark it complete merely because feature work is finished or its branch has been pushed.
 - Record future user directives in this document and refer to them while working.

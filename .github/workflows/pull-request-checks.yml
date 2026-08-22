@@ -1,0 +1,75 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pull-request-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate application
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/f1_race_dashboard
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: f1_race_dashboard
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d f1_race_dashboard"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Check out pull request
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Analyze changed TypeScript and JavaScript
+        run: npm run fallow -- --base "${{ github.event.pull_request.base.sha }}"
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check TypeScript types
+        run: npm run typecheck
+
+      - name: Apply database migrations
+        run: npm run db:migrate
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run database integration tests
+        run: npm run test:integration
+
+      - name: Create production build
+        run: npm run build

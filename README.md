@@ -1,0 +1,50 @@
+# F1 Race Dashboard
+
+An unofficial, non-affiliated portfolio project for exploring Formula 1 history, current-season results, and session analytics. It does not use Formula 1 logos, official fonts, video, or live timing.
+
+## Local setup
+
+### Prerequisites
+
+- Node.js 24 or later
+- A local PostgreSQL server
+- A database named `f1_race_dashboard`
+
+pgAdmin is only a database administration client. Create the local database through pgAdmin, then copy `.env.example` to `.env` and set a local connection string:
+
+```env
+DATABASE_URL=postgresql://postgres:your-local-password@localhost:5432/f1_race_dashboard
+```
+
+Never commit `.env`; it is ignored by Git.
+
+### Install and run
+
+```powershell
+npm install
+npm run db:check
+npm run db:migrate
+npm run dev
+```
+
+The database is the application’s canonical data store. Pages will query it rather than public source APIs at render time.
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Next.js development server. |
+| `npm run lint` | Run ESLint. |
+| `npm run typecheck` | Run TypeScript validation. |
+| `npm test` | Run unit tests. |
+| `npm run test:integration` | Validate the applied local database migration. |
+| `npm run build` | Build the production app. |
+| `npm run db:check` | Verify the local PostgreSQL connection. |
+| `npm run db:generate` | Generate a migration after a schema change. |
+| `npm run db:migrate` | Apply committed migrations to the configured database. |
+
+## Current database foundation
+
+The initial migration creates `import_runs`, an audit log for ingestion attempts. It tracks the source, import scope, outcome, timing, record counts, and error details. Future schema branches will add normalized Formula 1 reference data and associate imported records with an import run.
+
+No Formula 1 source data has been imported yet. The future Jolpica and FastF1 workers will be separate from the Next.js request lifecycle, rerunnable, rate-limited, and idempotent.

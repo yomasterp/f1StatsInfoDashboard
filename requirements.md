@@ -102,7 +102,7 @@
 
 ### 4.3 Results and standings
 
-- [ ] Create `race_results`.
+- [x] Create `race_results`.
   - Stores grid position, classified and finishing positions, points, laps completed, time/laps behind, fastest-lap fields, driver, constructor, and status.
 - [ ] Create `qualifying_results`.
   - Stores Q1, Q2, Q3, qualifying position, and final grid position separately because penalties can change the grid.

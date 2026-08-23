@@ -121,9 +121,9 @@
   - Stores Q1, Q2, Q3, qualifying position, and final grid position separately because penalties can change the grid.
 - [x] Create `sprint_results`.
   - Must support seasons with no sprint events and evolving sprint formats.
-- [ ] Create `practice_results`.
+- [x] Create `practice_results`.
   - Stores session classification, best lap, laps completed, driver, and constructor for 2018+ sessions where data is available.
-- [ ] Create `driver_standings` and `constructor_standings`.
+- [x] Create `driver_standings` and `constructor_standings`.
   - Store standings after each relevant scoring event, not only final standings.
 - [ ] Create `driver_championship_results` and `constructor_championship_results`.
   - Store each final season classification and season totals for fast historical pages.

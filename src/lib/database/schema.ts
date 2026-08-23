@@ -548,6 +548,15 @@ export const sessions = pgTable(
   ],
 );
 
+const importedRecordColumns = () => ({
+  importRunId: integer("import_run_id").references(() => importRuns.id, {
+    onDelete: "restrict",
+  }),
+  source: text("source"),
+  sourceIdentifier: text("source_identifier"),
+  importedAt: timestamp("imported_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 const classificationResultColumns = () => ({
   id: bigserial("id", { mode: "number" }).primaryKey(),
   sessionId: integer("session_id")
@@ -578,12 +587,7 @@ const classificationResultColumns = () => ({
     scale: 3,
   }),
   fastestLapAwarded: boolean("fastest_lap_awarded").notNull().default(false),
-  importRunId: integer("import_run_id").references(() => importRuns.id, {
-    onDelete: "restrict",
-  }),
-  source: text("source"),
-  sourceIdentifier: text("source_identifier"),
-  importedAt: timestamp("imported_at", { withTimezone: true }).notNull().defaultNow(),
+  ...importedRecordColumns(),
 });
 
 const sessionSummaryResultColumns = () => ({
@@ -600,12 +604,7 @@ const sessionSummaryResultColumns = () => ({
   statusCodeId: integer("status_code_id").references(() => statusCodes.id, {
     onDelete: "restrict",
   }),
-  importRunId: integer("import_run_id").references(() => importRuns.id, {
-    onDelete: "restrict",
-  }),
-  source: text("source"),
-  sourceIdentifier: text("source_identifier"),
-  importedAt: timestamp("imported_at", { withTimezone: true }).notNull().defaultNow(),
+  ...importedRecordColumns(),
   notes: text("notes"),
 });
 
@@ -851,6 +850,87 @@ export const practiceResults = pgTable(
       sql`${table.gapToLeaderMs} IS NULL OR ${table.bestLapTimeMs} IS NOT NULL`,
     ),
     ...sourceRecordChecks(table, "practice_results"),
+  ],
+);
+
+const championshipStandingColumns = () => ({
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  afterSessionId: integer("after_session_id")
+    .notNull()
+    .references(() => sessions.id, { onDelete: "restrict" }),
+  position: integer("position").notNull(),
+  points: numeric("points", { precision: 8, scale: 3 }).notNull().default("0"),
+  wins: integer("wins").notNull().default(0),
+  countbackDetails: jsonb("countback_details"),
+  ...importedRecordColumns(),
+});
+
+type ChampionshipStandingColumns = {
+  afterSessionId: PgColumn;
+  position: PgColumn;
+  importRunId: PgColumn;
+  source: PgColumn;
+  sourceIdentifier: PgColumn;
+};
+
+const championshipStandingIndexes = (
+  table: ChampionshipStandingColumns,
+  entrantId: PgColumn,
+  tableName: string,
+) => [
+  uniqueIndex(`${tableName}_session_entrant_unique`).on(
+    table.afterSessionId,
+    entrantId,
+  ),
+  uniqueIndex(`${tableName}_source_identifier_unique`).on(
+    table.source,
+    table.sourceIdentifier,
+  ),
+  index(`${tableName}_session_position_idx`).on(
+    table.afterSessionId,
+    table.position,
+  ),
+  index(`${tableName}_entrant_session_idx`).on(entrantId, table.afterSessionId),
+  index(`${tableName}_import_run_id_idx`).on(table.importRunId),
+];
+
+/** A driver's points and countback evidence immediately after a scoring session. */
+export const driverStandings = pgTable(
+  "driver_standings",
+  {
+    ...championshipStandingColumns(),
+    driverId: integer("driver_id")
+      .notNull()
+      .references(() => drivers.id, { onDelete: "restrict" }),
+  },
+  (table) => [
+    ...championshipStandingIndexes(table, table.driverId, "driver_standings"),
+    check("driver_standings_position_positive", sql`${table.position} > 0`),
+    check("driver_standings_points_non_negative", sql`${table.points} >= 0`),
+    check("driver_standings_wins_non_negative", sql`${table.wins} >= 0`),
+    ...sourceRecordChecks(table, "driver_standings"),
+  ],
+);
+
+/** A constructor's points and countback evidence immediately after a scoring session. */
+export const constructorStandings = pgTable(
+  "constructor_standings",
+  {
+    ...championshipStandingColumns(),
+    constructorId: integer("constructor_id")
+      .notNull()
+      .references(() => constructors.id, { onDelete: "restrict" }),
+  },
+  (table) => [
+    ...championshipStandingIndexes(
+      table,
+      table.constructorId,
+      "constructor_standings",
+    ),
+    check("constructor_standings_position_positive", sql`${table.position} > 0`),
+    check("constructor_standings_points_non_negative", sql`${table.points} >= 0`),
+    check("constructor_standings_wins_non_negative", sql`${table.wins} >= 0`),
+    ...sourceRecordChecks(table, "constructor_standings"),
   ],
 );
 

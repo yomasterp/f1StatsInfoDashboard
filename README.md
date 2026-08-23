@@ -65,6 +65,8 @@ The sprint-results migration stores each driver's grid, finish and classified po
 
 The practice-results migration stores each driver's session classification, constructor, optional status, best-lap time and lap number, gap to the session leader, and completed-lap count. Nullable timing fields preserve the difference between a driver who set no representative time and one whose data has not yet been imported, while source and import-run fields keep later FastF1 ingestion traceable.
 
+The driver- and constructor-standings migration records a snapshot after each scoring session. Each snapshot stores the ranked entrant, exact points, win count, optional countback evidence, and source/import provenance; the session reference makes sprint and race standings distinct without assuming every season follows the same weekend format.
+
 The news-foundation migration adds normalized `news_sources` and `news_articles`. Article records contain discovery metadata and short descriptions, link to their publisher and import run, and are deduplicated by both canonical URL and provider record identifier. Full article bodies are intentionally discarded.
 
 To verify a key and import news after applying migrations:

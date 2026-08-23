@@ -36,6 +36,20 @@ const sourceAliasChecks = (table: SourceAliasColumns, tableName: string) => [
   check(`${tableName}_alias_not_blank`, hasNonBlankText(table.alias)),
 ];
 
+type SourceRecordColumns = {
+  source: SQLWrapper;
+  sourceIdentifier: SQLWrapper;
+};
+
+const sourceRecordChecks = (table: SourceRecordColumns, tableName: string) => [
+  check(
+    `${tableName}_source_fields_paired`,
+    sql`(${table.source} IS NULL AND ${table.sourceIdentifier} IS NULL) OR (${table.source} IS NOT NULL AND ${table.sourceIdentifier} IS NOT NULL AND ${hasNonBlankText(
+      table.source,
+    )} AND ${hasNonBlankText(table.sourceIdentifier)})`,
+  ),
+];
+
 export const importRunStatus = pgEnum("import_run_status", [
   "running",
   "succeeded",
@@ -635,11 +649,91 @@ export const raceResults = pgTable(
       "race_results_fastest_lap_average_speed_positive",
       sql`${table.fastestLapAverageSpeedKph} IS NULL OR ${table.fastestLapAverageSpeedKph} > 0`,
     ),
-    check(
-      "race_results_source_fields_paired",
-      sql`(${table.source} IS NULL AND ${table.sourceIdentifier} IS NULL) OR (${table.source} IS NOT NULL AND ${table.sourceIdentifier} IS NOT NULL AND ${hasNonBlankText(
-        table.source,
-      )} AND ${hasNonBlankText(table.sourceIdentifier)})`,
+    ...sourceRecordChecks(table, "race_results"),
+  ],
+);
+
+/** A driver's official qualifying classification and resulting race-grid position. */
+export const qualifyingResults = pgTable(
+  "qualifying_results",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    sessionId: integer("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "restrict" }),
+    driverId: integer("driver_id")
+      .notNull()
+      .references(() => drivers.id, { onDelete: "restrict" }),
+    constructorId: integer("constructor_id")
+      .notNull()
+      .references(() => constructors.id, { onDelete: "restrict" }),
+    statusCodeId: integer("status_code_id").references(() => statusCodes.id, {
+      onDelete: "restrict",
+    }),
+    qualifyingPosition: integer("qualifying_position"),
+    finalGridPosition: integer("final_grid_position"),
+    q1TimeMs: integer("q1_time_ms"),
+    q2TimeMs: integer("q2_time_ms"),
+    q3TimeMs: integer("q3_time_ms"),
+    importRunId: integer("import_run_id").references(() => importRuns.id, {
+      onDelete: "restrict",
+    }),
+    source: text("source"),
+    sourceIdentifier: text("source_identifier"),
+    importedAt: timestamp("imported_at", { withTimezone: true }).notNull().defaultNow(),
+    notes: text("notes"),
+  },
+  (table) => [
+    uniqueIndex("qualifying_results_session_driver_unique").on(
+      table.sessionId,
+      table.driverId,
     ),
+    uniqueIndex("qualifying_results_source_identifier_unique").on(
+      table.source,
+      table.sourceIdentifier,
+    ),
+    index("qualifying_results_session_position_idx").on(
+      table.sessionId,
+      table.qualifyingPosition,
+    ),
+    index("qualifying_results_driver_session_idx").on(
+      table.driverId,
+      table.sessionId,
+    ),
+    index("qualifying_results_constructor_session_idx").on(
+      table.constructorId,
+      table.sessionId,
+    ),
+    index("qualifying_results_status_code_id_idx").on(table.statusCodeId),
+    index("qualifying_results_import_run_id_idx").on(table.importRunId),
+    check(
+      "qualifying_results_position_positive",
+      sql`${table.qualifyingPosition} IS NULL OR ${table.qualifyingPosition} > 0`,
+    ),
+    check(
+      "qualifying_results_final_grid_non_negative",
+      sql`${table.finalGridPosition} IS NULL OR ${table.finalGridPosition} >= 0`,
+    ),
+    check(
+      "qualifying_results_q1_time_positive",
+      sql`${table.q1TimeMs} IS NULL OR ${table.q1TimeMs} > 0`,
+    ),
+    check(
+      "qualifying_results_q2_time_positive",
+      sql`${table.q2TimeMs} IS NULL OR ${table.q2TimeMs} > 0`,
+    ),
+    check(
+      "qualifying_results_q3_time_positive",
+      sql`${table.q3TimeMs} IS NULL OR ${table.q3TimeMs} > 0`,
+    ),
+    check(
+      "qualifying_results_q2_requires_q1",
+      sql`${table.q2TimeMs} IS NULL OR ${table.q1TimeMs} IS NOT NULL`,
+    ),
+    check(
+      "qualifying_results_q3_requires_q2",
+      sql`${table.q3TimeMs} IS NULL OR ${table.q2TimeMs} IS NOT NULL`,
+    ),
+    ...sourceRecordChecks(table, "qualifying_results"),
   ],
 );

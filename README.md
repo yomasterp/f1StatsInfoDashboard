@@ -54,4 +54,6 @@ The race-weekend migration adds races and sessions. Races identify the season, r
 
 The race-results migration records each driver's official race classification, constructor, finishing status, grid and finishing positions, points, completed laps, race time or deficit, and fastest-lap details. Results link to a specific session and retain optional source/import identifiers so future ingestion can rerun deterministically without duplicating a driver in the same race classification.
 
+The qualifying-results migration keeps Q1, Q2, and Q3 best times separate from both the official qualifying classification and the final race-grid position. This preserves grid penalties and pit-lane starts without rewriting the qualifying result, while nullable phase times support historical formats and drivers who did not advance or set a time.
+
 No Formula 1 source data has been imported yet. The future Jolpica and FastF1 workers will be separate from the Next.js request lifecycle, rerunnable, rate-limited, and idempotent.

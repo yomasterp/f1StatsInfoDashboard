@@ -63,6 +63,8 @@ The qualifying-results migration keeps Q1, Q2, and Q3 best times separate from b
 
 The sprint-results migration stores each driver's grid, finish and classified positions, constructor, status, exact points, completed laps, timing or lap deficits, and optional fastest-lap details for a sprint session. It does not hard-code a scoring distribution, so historical and future sprint formats can use the points system applicable to their season.
 
+The practice-results migration stores each driver's session classification, constructor, optional status, best-lap time and lap number, gap to the session leader, and completed-lap count. Nullable timing fields preserve the difference between a driver who set no representative time and one whose data has not yet been imported, while source and import-run fields keep later FastF1 ingestion traceable.
+
 The news-foundation migration adds normalized `news_sources` and `news_articles`. Article records contain discovery metadata and short descriptions, link to their publisher and import run, and are deduplicated by both canonical URL and provider record identifier. Full article bodies are intentionally discarded.
 
 To verify a key and import news after applying migrations:

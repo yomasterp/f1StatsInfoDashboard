@@ -1,0 +1,36 @@
+{
+  "status": "ok",
+  "totalResults": 3,
+  "articles": [
+    {
+      "source": { "id": "example-motorsport", "name": "Example Motorsport" },
+      "author": "Alex Reporter",
+      "title": "Formula 1 team reveals its next development package",
+      "description": "A short provider-supplied summary of the Formula 1 report.",
+      "url": "https://news.example.com/f1/development-package?utm_source=feed&ref=home",
+      "urlToImage": "https://news.example.com/images/development-package.jpg",
+      "publishedAt": "2026-08-22T18:30:00Z",
+      "content": "This provider field is deliberately not retained by the application."
+    },
+    {
+      "source": { "id": null, "name": "Racing Journal" },
+      "author": null,
+      "title": "Race weekend analysis",
+      "description": null,
+      "url": "https://racing.example.org/analysis/weekend/#overview",
+      "urlToImage": null,
+      "publishedAt": "2026-08-22T17:15:00+00:00",
+      "content": null
+    },
+    {
+      "source": { "id": null, "name": "Removed Publisher" },
+      "author": null,
+      "title": "[Removed]",
+      "description": null,
+      "url": "https://removed.example.net/article",
+      "urlToImage": null,
+      "publishedAt": "2026-08-22T16:00:00Z",
+      "content": null
+    }
+  ]
+}

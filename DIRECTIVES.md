@@ -16,6 +16,7 @@ This document records standing project directions from the user. Review it befor
 
 - Read `requirements.md` before project work.
 - Tackle requirements in order, using requirement-aligned branch names.
+- The Formula 1 news foundation may be developed in parallel before the remaining results and standings requirements; keep each news phase on its own requirement-aligned feature branch.
 - Mark a requirement complete only after its pull request has been merged and closed; do not mark it complete merely because feature work is finished or its branch has been pushed.
 - Add comprehensive automated tests that cover identified gaps, and run ESLint as part of every relevant change.
 - Do not confirm work is complete until all relevant tests, type checks, builds, migrations, and ESLint checks pass.
@@ -24,6 +25,8 @@ This document records standing project directions from the user. Review it befor
 - When another language is introduced, add and run that ecosystem's relevant test, lint, formatting, type-checking, and build tooling before confirming work is complete.
 - Run the GitHub Actions pull-request checks for every pull request targeting `main`, and require the successful check before merging.
 - Record future user directives in this document and refer to them while working.
+- Give every newly added requirement and nested subrequirement a stable, descriptive identifier so branches, tests, and pull requests can reference it directly.
+- Keep news-provider credentials only in the root `.env`; commit placeholders and setup instructions, never real API keys.
 
 ## Design and user experience
 

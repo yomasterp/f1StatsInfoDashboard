@@ -1,0 +1,3093 @@
+{
+  "id": "661ef1e0-6811-4834-9733-2eeb59558684",
+  "prevId": "72e80da7-cd1d-47a1-868f-47a8001ea17a",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.circuit_configurations": {
+      "name": "circuit_configurations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "circuit_id": {
+          "name": "circuit_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "length_km": {
+          "name": "length_km",
+          "type": "numeric(6, 3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "effective_from_season": {
+          "name": "effective_from_season",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "effective_to_season": {
+          "name": "effective_to_season",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "circuit_configurations_circuit_code_unique": {
+          "name": "circuit_configurations_circuit_code_unique",
+          "columns": [
+            {
+              "expression": "circuit_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "circuit_configurations_circuit_id_idx": {
+          "name": "circuit_configurations_circuit_id_idx",
+          "columns": [
+            {
+              "expression": "circuit_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "circuit_configurations_circuit_id_circuits_id_fk": {
+          "name": "circuit_configurations_circuit_id_circuits_id_fk",
+          "tableFrom": "circuit_configurations",
+          "tableTo": "circuits",
+          "columnsFrom": [
+            "circuit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "circuit_configurations_effective_from_season_seasons_year_fk": {
+          "name": "circuit_configurations_effective_from_season_seasons_year_fk",
+          "tableFrom": "circuit_configurations",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "effective_from_season"
+          ],
+          "columnsTo": [
+            "year"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "circuit_configurations_effective_to_season_seasons_year_fk": {
+          "name": "circuit_configurations_effective_to_season_seasons_year_fk",
+          "tableFrom": "circuit_configurations",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "effective_to_season"
+          ],
+          "columnsTo": [
+            "year"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "circuit_configurations_code_not_blank": {
+          "name": "circuit_configurations_code_not_blank",
+          "value": "char_length(trim(\"circuit_configurations\".\"code\")) > 0"
+        },
+        "circuit_configurations_name_not_blank": {
+          "name": "circuit_configurations_name_not_blank",
+          "value": "char_length(trim(\"circuit_configurations\".\"name\")) > 0"
+        },
+        "circuit_configurations_length_positive": {
+          "name": "circuit_configurations_length_positive",
+          "value": "\"circuit_configurations\".\"length_km\" IS NULL OR \"circuit_configurations\".\"length_km\" > 0"
+        },
+        "circuit_configurations_effective_range": {
+          "name": "circuit_configurations_effective_range",
+          "value": "\"circuit_configurations\".\"effective_to_season\" IS NULL OR \"circuit_configurations\".\"effective_from_season\" IS NULL OR \"circuit_configurations\".\"effective_from_season\" <= \"circuit_configurations\".\"effective_to_season\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.circuits": {
+      "name": "circuits",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "locality": {
+          "name": "locality",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country_id": {
+          "name": "country_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "numeric(8, 5)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "numeric(8, 5)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "circuits_slug_unique": {
+          "name": "circuits_slug_unique",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "circuits_country_id_idx": {
+          "name": "circuits_country_id_idx",
+          "columns": [
+            {
+              "expression": "country_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "circuits_country_id_countries_id_fk": {
+          "name": "circuits_country_id_countries_id_fk",
+          "tableFrom": "circuits",
+          "tableTo": "countries",
+          "columnsFrom": [
+            "country_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "circuits_slug_not_blank": {
+          "name": "circuits_slug_not_blank",
+          "value": "char_length(trim(\"circuits\".\"slug\")) > 0"
+        },
+        "circuits_name_not_blank": {
+          "name": "circuits_name_not_blank",
+          "value": "char_length(trim(\"circuits\".\"name\")) > 0"
+        },
+        "circuits_latitude_range": {
+          "name": "circuits_latitude_range",
+          "value": "\"circuits\".\"latitude\" IS NULL OR \"circuits\".\"latitude\" BETWEEN -90 AND 90"
+        },
+        "circuits_longitude_range": {
+          "name": "circuits_longitude_range",
+          "value": "\"circuits\".\"longitude\" IS NULL OR \"circuits\".\"longitude\" BETWEEN -180 AND 180"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.constructor_aliases": {
+      "name": "constructor_aliases",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "constructor_id": {
+          "name": "constructor_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_identifier": {
+          "name": "source_identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alias": {
+          "name": "alias",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "constructor_aliases_source_identifier_unique": {
+          "name": "constructor_aliases_source_identifier_unique",
+          "columns": [
+            {
+              "expression": "source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source_identifier",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "constructor_aliases_constructor_source_alias_unique": {
+          "name": "constructor_aliases_constructor_source_alias_unique",
+          "columns": [
+            {
+              "expression": "constructor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "alias",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "constructor_aliases_constructor_id_idx": {
+          "name": "constructor_aliases_constructor_id_idx",
+          "columns": [
+            {
+              "expression": "constructor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "constructor_aliases_constructor_id_constructors_id_fk": {
+          "name": "constructor_aliases_constructor_id_constructors_id_fk",
+          "tableFrom": "constructor_aliases",
+          "tableTo": "constructors",
+          "columnsFrom": [
+            "constructor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "constructor_aliases_source_not_blank": {
+          "name": "constructor_aliases_source_not_blank",
+          "value": "char_length(trim(\"constructor_aliases\".\"source\")) > 0"
+        },
+        "constructor_aliases_source_identifier_not_blank": {
+          "name": "constructor_aliases_source_identifier_not_blank",
+          "value": "char_length(trim(\"constructor_aliases\".\"source_identifier\")) > 0"
+        },
+        "constructor_aliases_alias_not_blank": {
+          "name": "constructor_aliases_alias_not_blank",
+          "value": "char_length(trim(\"constructor_aliases\".\"alias\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.constructors": {
+      "name": "constructors",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nationality_country_id": {
+          "name": "nationality_country_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "constructors_slug_unique": {
+          "name": "constructors_slug_unique",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "constructors_nationality_country_id_idx": {
+          "name": "constructors_nationality_country_id_idx",
+          "columns": [
+            {
+              "expression": "nationality_country_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "constructors_nationality_country_id_countries_id_fk": {
+          "name": "constructors_nationality_country_id_countries_id_fk",
+          "tableFrom": "constructors",
+          "tableTo": "countries",
+          "columnsFrom": [
+            "nationality_country_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "constructors_slug_not_blank": {
+          "name": "constructors_slug_not_blank",
+          "value": "char_length(trim(\"constructors\".\"slug\")) > 0"
+        },
+        "constructors_name_not_blank": {
+          "name": "constructors_name_not_blank",
+          "value": "char_length(trim(\"constructors\".\"name\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.countries": {
+      "name": "countries",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "iso_alpha2": {
+          "name": "iso_alpha2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "iso_alpha3": {
+          "name": "iso_alpha3",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "demonym": {
+          "name": "demonym",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "countries_iso_alpha2_unique": {
+          "name": "countries_iso_alpha2_unique",
+          "columns": [
+            {
+              "expression": "iso_alpha2",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "countries_iso_alpha3_unique": {
+          "name": "countries_iso_alpha3_unique",
+          "columns": [
+            {
+              "expression": "iso_alpha3",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "countries_name_unique": {
+          "name": "countries_name_unique",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "countries_iso_alpha2_length": {
+          "name": "countries_iso_alpha2_length",
+          "value": "char_length(\"countries\".\"iso_alpha2\") = 2"
+        },
+        "countries_iso_alpha2_uppercase": {
+          "name": "countries_iso_alpha2_uppercase",
+          "value": "\"countries\".\"iso_alpha2\" = upper(\"countries\".\"iso_alpha2\")"
+        },
+        "countries_iso_alpha3_length": {
+          "name": "countries_iso_alpha3_length",
+          "value": "\"countries\".\"iso_alpha3\" IS NULL OR char_length(\"countries\".\"iso_alpha3\") = 3"
+        },
+        "countries_iso_alpha3_uppercase": {
+          "name": "countries_iso_alpha3_uppercase",
+          "value": "\"countries\".\"iso_alpha3\" IS NULL OR \"countries\".\"iso_alpha3\" = upper(\"countries\".\"iso_alpha3\")"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.driver_aliases": {
+      "name": "driver_aliases",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "driver_id": {
+          "name": "driver_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_identifier": {
+          "name": "source_identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alias": {
+          "name": "alias",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "driver_aliases_source_identifier_unique": {
+          "name": "driver_aliases_source_identifier_unique",
+          "columns": [
+            {
+              "expression": "source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source_identifier",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "driver_aliases_driver_source_alias_unique": {
+          "name": "driver_aliases_driver_source_alias_unique",
+          "columns": [
+            {
+              "expression": "driver_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "alias",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "driver_aliases_driver_id_idx": {
+          "name": "driver_aliases_driver_id_idx",
+          "columns": [
+            {
+              "expression": "driver_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "driver_aliases_driver_id_drivers_id_fk": {
+          "name": "driver_aliases_driver_id_drivers_id_fk",
+          "tableFrom": "driver_aliases",
+          "tableTo": "drivers",
+          "columnsFrom": [
+            "driver_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "driver_aliases_source_not_blank": {
+          "name": "driver_aliases_source_not_blank",
+          "value": "char_length(trim(\"driver_aliases\".\"source\")) > 0"
+        },
+        "driver_aliases_source_identifier_not_blank": {
+          "name": "driver_aliases_source_identifier_not_blank",
+          "value": "char_length(trim(\"driver_aliases\".\"source_identifier\")) > 0"
+        },
+        "driver_aliases_alias_not_blank": {
+          "name": "driver_aliases_alias_not_blank",
+          "value": "char_length(trim(\"driver_aliases\".\"alias\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.drivers": {
+      "name": "drivers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "given_name": {
+          "name": "given_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "family_name": {
+          "name": "family_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_of_birth": {
+          "name": "date_of_birth",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nationality_country_id": {
+          "name": "nationality_country_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "permanent_number": {
+          "name": "permanent_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "drivers_slug_unique": {
+          "name": "drivers_slug_unique",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "drivers_permanent_number_unique": {
+          "name": "drivers_permanent_number_unique",
+          "columns": [
+            {
+              "expression": "permanent_number",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "drivers_nationality_country_id_idx": {
+          "name": "drivers_nationality_country_id_idx",
+          "columns": [
+            {
+              "expression": "nationality_country_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "drivers_nationality_country_id_countries_id_fk": {
+          "name": "drivers_nationality_country_id_countries_id_fk",
+          "tableFrom": "drivers",
+          "tableTo": "countries",
+          "columnsFrom": [
+            "nationality_country_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "drivers_slug_not_blank": {
+          "name": "drivers_slug_not_blank",
+          "value": "char_length(trim(\"drivers\".\"slug\")) > 0"
+        },
+        "drivers_given_name_not_blank": {
+          "name": "drivers_given_name_not_blank",
+          "value": "char_length(trim(\"drivers\".\"given_name\")) > 0"
+        },
+        "drivers_family_name_not_blank": {
+          "name": "drivers_family_name_not_blank",
+          "value": "char_length(trim(\"drivers\".\"family_name\")) > 0"
+        },
+        "drivers_permanent_number_range": {
+          "name": "drivers_permanent_number_range",
+          "value": "\"drivers\".\"permanent_number\" IS NULL OR \"drivers\".\"permanent_number\" BETWEEN 0 AND 99"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.import_runs": {
+      "name": "import_runs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scope": {
+          "name": "scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "import_run_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'running'"
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_ms": {
+          "name": "duration_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "records_processed": {
+          "name": "records_processed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "record_counts": {
+          "name": "record_counts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error_details": {
+          "name": "error_details",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "import_runs_source_status_started_at_idx": {
+          "name": "import_runs_source_status_started_at_idx",
+          "columns": [
+            {
+              "expression": "source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "started_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "import_runs_duration_ms_non_negative": {
+          "name": "import_runs_duration_ms_non_negative",
+          "value": "\"import_runs\".\"duration_ms\" IS NULL OR \"import_runs\".\"duration_ms\" >= 0"
+        },
+        "import_runs_records_processed_non_negative": {
+          "name": "import_runs_records_processed_non_negative",
+          "value": "\"import_runs\".\"records_processed\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.news_articles": {
+      "name": "news_articles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "news_source_id": {
+          "name": "news_source_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider_record_identifier": {
+          "name": "provider_record_identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "canonical_url": {
+          "name": "canonical_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "author": {
+          "name": "author",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'en'"
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "first_seen_at": {
+          "name": "first_seen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "last_seen_at": {
+          "name": "last_seen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "import_run_id": {
+          "name": "import_run_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "news_articles_canonical_url_unique": {
+          "name": "news_articles_canonical_url_unique",
+          "columns": [
+            {
+              "expression": "canonical_url",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "news_articles_provider_record_unique": {
+          "name": "news_articles_provider_record_unique",
+          "columns": [
+            {
+              "expression": "provider",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "provider_record_identifier",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "news_articles_published_at_idx": {
+          "name": "news_articles_published_at_idx",
+          "columns": [
+            {
+              "expression": "published_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "news_articles_source_published_at_idx": {
+          "name": "news_articles_source_published_at_idx",
+          "columns": [
+            {
+              "expression": "news_source_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "published_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "news_articles_import_run_id_idx": {
+          "name": "news_articles_import_run_id_idx",
+          "columns": [
+            {
+              "expression": "import_run_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "news_articles_news_source_id_news_sources_id_fk": {
+          "name": "news_articles_news_source_id_news_sources_id_fk",
+          "tableFrom": "news_articles",
+          "tableTo": "news_sources",
+          "columnsFrom": [
+            "news_source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "news_articles_import_run_id_import_runs_id_fk": {
+          "name": "news_articles_import_run_id_import_runs_id_fk",
+          "tableFrom": "news_articles",
+          "tableTo": "import_runs",
+          "columnsFrom": [
+            "import_run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "news_articles_provider_not_blank": {
+          "name": "news_articles_provider_not_blank",
+          "value": "char_length(trim(\"news_articles\".\"provider\")) > 0"
+        },
+        "news_articles_provider_record_identifier_not_blank": {
+          "name": "news_articles_provider_record_identifier_not_blank",
+          "value": "char_length(trim(\"news_articles\".\"provider_record_identifier\")) > 0"
+        },
+        "news_articles_canonical_url_not_blank": {
+          "name": "news_articles_canonical_url_not_blank",
+          "value": "char_length(trim(\"news_articles\".\"canonical_url\")) > 0"
+        },
+        "news_articles_title_not_blank": {
+          "name": "news_articles_title_not_blank",
+          "value": "char_length(trim(\"news_articles\".\"title\")) > 0"
+        },
+        "news_articles_language_code": {
+          "name": "news_articles_language_code",
+          "value": "char_length(\"news_articles\".\"language\") = 2 AND \"news_articles\".\"language\" = lower(\"news_articles\".\"language\")"
+        },
+        "news_articles_seen_range": {
+          "name": "news_articles_seen_range",
+          "value": "\"news_articles\".\"last_seen_at\" >= \"news_articles\".\"first_seen_at\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.news_sources": {
+      "name": "news_sources",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider_source_identifier": {
+          "name": "provider_source_identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain": {
+          "name": "domain",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "homepage_url": {
+          "name": "homepage_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "news_sources_provider_domain_unique": {
+          "name": "news_sources_provider_domain_unique",
+          "columns": [
+            {
+              "expression": "provider",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "domain",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "news_sources_provider_identifier_unique": {
+          "name": "news_sources_provider_identifier_unique",
+          "columns": [
+            {
+              "expression": "provider",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "provider_source_identifier",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "news_sources_provider_not_blank": {
+          "name": "news_sources_provider_not_blank",
+          "value": "char_length(trim(\"news_sources\".\"provider\")) > 0"
+        },
+        "news_sources_name_not_blank": {
+          "name": "news_sources_name_not_blank",
+          "value": "char_length(trim(\"news_sources\".\"name\")) > 0"
+        },
+        "news_sources_domain_not_blank": {
+          "name": "news_sources_domain_not_blank",
+          "value": "char_length(trim(\"news_sources\".\"domain\")) > 0"
+        },
+        "news_sources_domain_lowercase": {
+          "name": "news_sources_domain_lowercase",
+          "value": "\"news_sources\".\"domain\" = lower(\"news_sources\".\"domain\")"
+        },
+        "news_sources_homepage_url_not_blank": {
+          "name": "news_sources_homepage_url_not_blank",
+          "value": "char_length(trim(\"news_sources\".\"homepage_url\")) > 0"
+        },
+        "news_sources_provider_identifier_not_blank": {
+          "name": "news_sources_provider_identifier_not_blank",
+          "value": "\"news_sources\".\"provider_source_identifier\" IS NULL OR char_length(trim(\"news_sources\".\"provider_source_identifier\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.points_systems": {
+      "name": "points_systems",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effective_from_season": {
+          "name": "effective_from_season",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "effective_to_season": {
+          "name": "effective_to_season",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rules": {
+          "name": "rules",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "points_systems_code_unique": {
+          "name": "points_systems_code_unique",
+          "columns": [
+            {
+              "expression": "code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "points_systems_effective_from_season_seasons_year_fk": {
+          "name": "points_systems_effective_from_season_seasons_year_fk",
+          "tableFrom": "points_systems",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "effective_from_season"
+          ],
+          "columnsTo": [
+            "year"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "points_systems_effective_to_season_seasons_year_fk": {
+          "name": "points_systems_effective_to_season_seasons_year_fk",
+          "tableFrom": "points_systems",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "effective_to_season"
+          ],
+          "columnsTo": [
+            "year"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "points_systems_code_not_blank": {
+          "name": "points_systems_code_not_blank",
+          "value": "char_length(trim(\"points_systems\".\"code\")) > 0"
+        },
+        "points_systems_name_not_blank": {
+          "name": "points_systems_name_not_blank",
+          "value": "char_length(trim(\"points_systems\".\"name\")) > 0"
+        },
+        "points_systems_effective_range": {
+          "name": "points_systems_effective_range",
+          "value": "\"points_systems\".\"effective_to_season\" IS NULL OR \"points_systems\".\"effective_from_season\" IS NULL OR \"points_systems\".\"effective_from_season\" <= \"points_systems\".\"effective_to_season\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.qualifying_results": {
+      "name": "qualifying_results",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "driver_id": {
+          "name": "driver_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "constructor_id": {
+          "name": "constructor_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_code_id": {
+          "name": "status_code_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "qualifying_position": {
+          "name": "qualifying_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "final_grid_position": {
+          "name": "final_grid_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q1_time_ms": {
+          "name": "q1_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q2_time_ms": {
+          "name": "q2_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q3_time_ms": {
+          "name": "q3_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "import_run_id": {
+          "name": "import_run_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_identifier": {
+          "name": "source_identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imported_at": {
+          "name": "imported_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "qualifying_results_session_driver_unique": {
+          "name": "qualifying_results_session_driver_unique",
+          "columns": [
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "driver_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "qualifying_results_source_identifier_unique": {
+          "name": "qualifying_results_source_identifier_unique",
+          "columns": [
+            {
+              "expression": "source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source_identifier",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "qualifying_results_session_position_idx": {
+          "name": "qualifying_results_session_position_idx",
+          "columns": [
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "qualifying_position",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "qualifying_results_driver_session_idx": {
+          "name": "qualifying_results_driver_session_idx",
+          "columns": [
+            {
+              "expression": "driver_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "qualifying_results_constructor_session_idx": {
+          "name": "qualifying_results_constructor_session_idx",
+          "columns": [
+            {
+              "expression": "constructor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "qualifying_results_status_code_id_idx": {
+          "name": "qualifying_results_status_code_id_idx",
+          "columns": [
+            {
+              "expression": "status_code_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "qualifying_results_import_run_id_idx": {
+          "name": "qualifying_results_import_run_id_idx",
+          "columns": [
+            {
+              "expression": "import_run_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "qualifying_results_session_id_sessions_id_fk": {
+          "name": "qualifying_results_session_id_sessions_id_fk",
+          "tableFrom": "qualifying_results",
+          "tableTo": "sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "qualifying_results_driver_id_drivers_id_fk": {
+          "name": "qualifying_results_driver_id_drivers_id_fk",
+          "tableFrom": "qualifying_results",
+          "tableTo": "drivers",
+          "columnsFrom": [
+            "driver_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "qualifying_results_constructor_id_constructors_id_fk": {
+          "name": "qualifying_results_constructor_id_constructors_id_fk",
+          "tableFrom": "qualifying_results",
+          "tableTo": "constructors",
+          "columnsFrom": [
+            "constructor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "qualifying_results_status_code_id_status_codes_id_fk": {
+          "name": "qualifying_results_status_code_id_status_codes_id_fk",
+          "tableFrom": "qualifying_results",
+          "tableTo": "status_codes",
+          "columnsFrom": [
+            "status_code_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "qualifying_results_import_run_id_import_runs_id_fk": {
+          "name": "qualifying_results_import_run_id_import_runs_id_fk",
+          "tableFrom": "qualifying_results",
+          "tableTo": "import_runs",
+          "columnsFrom": [
+            "import_run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "qualifying_results_position_positive": {
+          "name": "qualifying_results_position_positive",
+          "value": "\"qualifying_results\".\"qualifying_position\" IS NULL OR \"qualifying_results\".\"qualifying_position\" > 0"
+        },
+        "qualifying_results_final_grid_non_negative": {
+          "name": "qualifying_results_final_grid_non_negative",
+          "value": "\"qualifying_results\".\"final_grid_position\" IS NULL OR \"qualifying_results\".\"final_grid_position\" >= 0"
+        },
+        "qualifying_results_q1_time_positive": {
+          "name": "qualifying_results_q1_time_positive",
+          "value": "\"qualifying_results\".\"q1_time_ms\" IS NULL OR \"qualifying_results\".\"q1_time_ms\" > 0"
+        },
+        "qualifying_results_q2_time_positive": {
+          "name": "qualifying_results_q2_time_positive",
+          "value": "\"qualifying_results\".\"q2_time_ms\" IS NULL OR \"qualifying_results\".\"q2_time_ms\" > 0"
+        },
+        "qualifying_results_q3_time_positive": {
+          "name": "qualifying_results_q3_time_positive",
+          "value": "\"qualifying_results\".\"q3_time_ms\" IS NULL OR \"qualifying_results\".\"q3_time_ms\" > 0"
+        },
+        "qualifying_results_q2_requires_q1": {
+          "name": "qualifying_results_q2_requires_q1",
+          "value": "\"qualifying_results\".\"q2_time_ms\" IS NULL OR \"qualifying_results\".\"q1_time_ms\" IS NOT NULL"
+        },
+        "qualifying_results_q3_requires_q2": {
+          "name": "qualifying_results_q3_requires_q2",
+          "value": "\"qualifying_results\".\"q3_time_ms\" IS NULL OR \"qualifying_results\".\"q2_time_ms\" IS NOT NULL"
+        },
+        "qualifying_results_source_fields_paired": {
+          "name": "qualifying_results_source_fields_paired",
+          "value": "(\"qualifying_results\".\"source\" IS NULL AND \"qualifying_results\".\"source_identifier\" IS NULL) OR (\"qualifying_results\".\"source\" IS NOT NULL AND \"qualifying_results\".\"source_identifier\" IS NOT NULL AND char_length(trim(\"qualifying_results\".\"source\")) > 0 AND char_length(trim(\"qualifying_results\".\"source_identifier\")) > 0)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.race_formats": {
+      "name": "race_formats",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "has_sprint": {
+          "name": "has_sprint",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "schedule": {
+          "name": "schedule",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effective_from_season": {
+          "name": "effective_from_season",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "effective_to_season": {
+          "name": "effective_to_season",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "race_formats_code_unique": {
+          "name": "race_formats_code_unique",
+          "columns": [
+            {
+              "expression": "code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "race_formats_effective_from_season_seasons_year_fk": {
+          "name": "race_formats_effective_from_season_seasons_year_fk",
+          "tableFrom": "race_formats",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "effective_from_season"
+          ],
+          "columnsTo": [
+            "year"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "race_formats_effective_to_season_seasons_year_fk": {
+          "name": "race_formats_effective_to_season_seasons_year_fk",
+          "tableFrom": "race_formats",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "effective_to_season"
+          ],
+          "columnsTo": [
+            "year"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "race_formats_code_not_blank": {
+          "name": "race_formats_code_not_blank",
+          "value": "char_length(trim(\"race_formats\".\"code\")) > 0"
+        },
+        "race_formats_name_not_blank": {
+          "name": "race_formats_name_not_blank",
+          "value": "char_length(trim(\"race_formats\".\"name\")) > 0"
+        },
+        "race_formats_effective_range": {
+          "name": "race_formats_effective_range",
+          "value": "\"race_formats\".\"effective_to_season\" IS NULL OR \"race_formats\".\"effective_from_season\" IS NULL OR \"race_formats\".\"effective_from_season\" <= \"race_formats\".\"effective_to_season\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.race_results": {
+      "name": "race_results",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "driver_id": {
+          "name": "driver_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "constructor_id": {
+          "name": "constructor_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_code_id": {
+          "name": "status_code_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "grid_position": {
+          "name": "grid_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "finish_position": {
+          "name": "finish_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "classified_position": {
+          "name": "classified_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points": {
+          "name": "points",
+          "type": "numeric(8, 3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "laps_completed": {
+          "name": "laps_completed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "elapsed_time_ms": {
+          "name": "elapsed_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "time_behind_ms": {
+          "name": "time_behind_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "laps_behind": {
+          "name": "laps_behind",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fastest_lap_rank": {
+          "name": "fastest_lap_rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fastest_lap_number": {
+          "name": "fastest_lap_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fastest_lap_time_ms": {
+          "name": "fastest_lap_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fastest_lap_average_speed_kph": {
+          "name": "fastest_lap_average_speed_kph",
+          "type": "numeric(8, 3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fastest_lap_awarded": {
+          "name": "fastest_lap_awarded",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "import_run_id": {
+          "name": "import_run_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_identifier": {
+          "name": "source_identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imported_at": {
+          "name": "imported_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "race_results_session_driver_unique": {
+          "name": "race_results_session_driver_unique",
+          "columns": [
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "driver_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "race_results_source_identifier_unique": {
+          "name": "race_results_source_identifier_unique",
+          "columns": [
+            {
+              "expression": "source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source_identifier",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "race_results_session_classified_position_idx": {
+          "name": "race_results_session_classified_position_idx",
+          "columns": [
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "classified_position",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "race_results_driver_session_idx": {
+          "name": "race_results_driver_session_idx",
+          "columns": [
+            {
+              "expression": "driver_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "race_results_constructor_session_idx": {
+          "name": "race_results_constructor_session_idx",
+          "columns": [
+            {
+              "expression": "constructor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "race_results_status_code_id_idx": {
+          "name": "race_results_status_code_id_idx",
+          "columns": [
+            {
+              "expression": "status_code_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "race_results_import_run_id_idx": {
+          "name": "race_results_import_run_id_idx",
+          "columns": [
+            {
+              "expression": "import_run_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "race_results_session_id_sessions_id_fk": {
+          "name": "race_results_session_id_sessions_id_fk",
+          "tableFrom": "race_results",
+          "tableTo": "sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "race_results_driver_id_drivers_id_fk": {
+          "name": "race_results_driver_id_drivers_id_fk",
+          "tableFrom": "race_results",
+          "tableTo": "drivers",
+          "columnsFrom": [
+            "driver_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "race_results_constructor_id_constructors_id_fk": {
+          "name": "race_results_constructor_id_constructors_id_fk",
+          "tableFrom": "race_results",
+          "tableTo": "constructors",
+          "columnsFrom": [
+            "constructor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "race_results_status_code_id_status_codes_id_fk": {
+          "name": "race_results_status_code_id_status_codes_id_fk",
+          "tableFrom": "race_results",
+          "tableTo": "status_codes",
+          "columnsFrom": [
+            "status_code_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "race_results_import_run_id_import_runs_id_fk": {
+          "name": "race_results_import_run_id_import_runs_id_fk",
+          "tableFrom": "race_results",
+          "tableTo": "import_runs",
+          "columnsFrom": [
+            "import_run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "race_results_grid_position_non_negative": {
+          "name": "race_results_grid_position_non_negative",
+          "value": "\"race_results\".\"grid_position\" IS NULL OR \"race_results\".\"grid_position\" >= 0"
+        },
+        "race_results_finish_position_positive": {
+          "name": "race_results_finish_position_positive",
+          "value": "\"race_results\".\"finish_position\" IS NULL OR \"race_results\".\"finish_position\" > 0"
+        },
+        "race_results_classified_position_positive": {
+          "name": "race_results_classified_position_positive",
+          "value": "\"race_results\".\"classified_position\" IS NULL OR \"race_results\".\"classified_position\" > 0"
+        },
+        "race_results_points_non_negative": {
+          "name": "race_results_points_non_negative",
+          "value": "\"race_results\".\"points\" >= 0"
+        },
+        "race_results_laps_completed_non_negative": {
+          "name": "race_results_laps_completed_non_negative",
+          "value": "\"race_results\".\"laps_completed\" >= 0"
+        },
+        "race_results_elapsed_time_ms_positive": {
+          "name": "race_results_elapsed_time_ms_positive",
+          "value": "\"race_results\".\"elapsed_time_ms\" IS NULL OR \"race_results\".\"elapsed_time_ms\" > 0"
+        },
+        "race_results_time_behind_ms_non_negative": {
+          "name": "race_results_time_behind_ms_non_negative",
+          "value": "\"race_results\".\"time_behind_ms\" IS NULL OR \"race_results\".\"time_behind_ms\" >= 0"
+        },
+        "race_results_laps_behind_positive": {
+          "name": "race_results_laps_behind_positive",
+          "value": "\"race_results\".\"laps_behind\" IS NULL OR \"race_results\".\"laps_behind\" > 0"
+        },
+        "race_results_fastest_lap_rank_positive": {
+          "name": "race_results_fastest_lap_rank_positive",
+          "value": "\"race_results\".\"fastest_lap_rank\" IS NULL OR \"race_results\".\"fastest_lap_rank\" > 0"
+        },
+        "race_results_fastest_lap_number_positive": {
+          "name": "race_results_fastest_lap_number_positive",
+          "value": "\"race_results\".\"fastest_lap_number\" IS NULL OR \"race_results\".\"fastest_lap_number\" > 0"
+        },
+        "race_results_fastest_lap_time_ms_positive": {
+          "name": "race_results_fastest_lap_time_ms_positive",
+          "value": "\"race_results\".\"fastest_lap_time_ms\" IS NULL OR \"race_results\".\"fastest_lap_time_ms\" > 0"
+        },
+        "race_results_fastest_lap_average_speed_positive": {
+          "name": "race_results_fastest_lap_average_speed_positive",
+          "value": "\"race_results\".\"fastest_lap_average_speed_kph\" IS NULL OR \"race_results\".\"fastest_lap_average_speed_kph\" > 0"
+        },
+        "race_results_source_fields_paired": {
+          "name": "race_results_source_fields_paired",
+          "value": "(\"race_results\".\"source\" IS NULL AND \"race_results\".\"source_identifier\" IS NULL) OR (\"race_results\".\"source\" IS NOT NULL AND \"race_results\".\"source_identifier\" IS NOT NULL AND char_length(trim(\"race_results\".\"source\")) > 0 AND char_length(trim(\"race_results\".\"source_identifier\")) > 0)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.races": {
+      "name": "races",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "season_year": {
+          "name": "season_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "round": {
+          "name": "round",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "official_name": {
+          "name": "official_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "circuit_configuration_id": {
+          "name": "circuit_configuration_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "race_format_id": {
+          "name": "race_format_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weekend_start_date": {
+          "name": "weekend_start_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weekend_end_date": {
+          "name": "weekend_end_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scheduled_start": {
+          "name": "scheduled_start",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "event_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'scheduled'"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "races_season_round_unique": {
+          "name": "races_season_round_unique",
+          "columns": [
+            {
+              "expression": "season_year",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "round",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "races_season_slug_unique": {
+          "name": "races_season_slug_unique",
+          "columns": [
+            {
+              "expression": "season_year",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "races_circuit_configuration_id_idx": {
+          "name": "races_circuit_configuration_id_idx",
+          "columns": [
+            {
+              "expression": "circuit_configuration_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "races_race_format_id_idx": {
+          "name": "races_race_format_id_idx",
+          "columns": [
+            {
+              "expression": "race_format_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "races_status_scheduled_start_idx": {
+          "name": "races_status_scheduled_start_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "scheduled_start",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "races_season_year_seasons_year_fk": {
+          "name": "races_season_year_seasons_year_fk",
+          "tableFrom": "races",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_year"
+          ],
+          "columnsTo": [
+            "year"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "races_circuit_configuration_id_circuit_configurations_id_fk": {
+          "name": "races_circuit_configuration_id_circuit_configurations_id_fk",
+          "tableFrom": "races",
+          "tableTo": "circuit_configurations",
+          "columnsFrom": [
+            "circuit_configuration_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "races_race_format_id_race_formats_id_fk": {
+          "name": "races_race_format_id_race_formats_id_fk",
+          "tableFrom": "races",
+          "tableTo": "race_formats",
+          "columnsFrom": [
+            "race_format_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "races_round_positive": {
+          "name": "races_round_positive",
+          "value": "\"races\".\"round\" > 0"
+        },
+        "races_slug_not_blank": {
+          "name": "races_slug_not_blank",
+          "value": "char_length(trim(\"races\".\"slug\")) > 0"
+        },
+        "races_official_name_not_blank": {
+          "name": "races_official_name_not_blank",
+          "value": "char_length(trim(\"races\".\"official_name\")) > 0"
+        },
+        "races_weekend_date_range": {
+          "name": "races_weekend_date_range",
+          "value": "\"races\".\"weekend_start_date\" <= \"races\".\"weekend_end_date\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.seasons": {
+      "name": "seasons",
+      "schema": "",
+      "columns": {
+        "year": {
+          "name": "year",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "championship_name": {
+          "name": "championship_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rounds": {
+          "name": "rounds",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "seasons_year_range": {
+          "name": "seasons_year_range",
+          "value": "\"seasons\".\"year\" BETWEEN 1950 AND 2100"
+        },
+        "seasons_rounds_non_negative": {
+          "name": "seasons_rounds_non_negative",
+          "value": "\"seasons\".\"rounds\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.session_types": {
+      "name": "session_types",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_championship_scoring": {
+          "name": "is_championship_scoring",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "session_types_code_unique": {
+          "name": "session_types_code_unique",
+          "columns": [
+            {
+              "expression": "code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "session_types_code_not_blank": {
+          "name": "session_types_code_not_blank",
+          "value": "char_length(trim(\"session_types\".\"code\")) > 0"
+        },
+        "session_types_name_not_blank": {
+          "name": "session_types_name_not_blank",
+          "value": "char_length(trim(\"session_types\".\"name\")) > 0"
+        },
+        "session_types_sequence_non_negative": {
+          "name": "session_types_sequence_non_negative",
+          "value": "\"session_types\".\"sequence\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.sessions": {
+      "name": "sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "race_id": {
+          "name": "race_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "session_type_id": {
+          "name": "session_type_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sequence": {
+          "name": "sequence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "planned_start": {
+          "name": "planned_start",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actual_start": {
+          "name": "actual_start",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "event_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'scheduled'"
+        },
+        "scheduled_laps": {
+          "name": "scheduled_laps",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "completed_laps": {
+          "name": "completed_laps",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "sessions_race_session_type_unique": {
+          "name": "sessions_race_session_type_unique",
+          "columns": [
+            {
+              "expression": "race_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "session_type_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "sessions_race_sequence_unique": {
+          "name": "sessions_race_sequence_unique",
+          "columns": [
+            {
+              "expression": "race_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "sequence",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "sessions_session_type_id_idx": {
+          "name": "sessions_session_type_id_idx",
+          "columns": [
+            {
+              "expression": "session_type_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "sessions_status_planned_start_idx": {
+          "name": "sessions_status_planned_start_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "planned_start",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "sessions_race_id_races_id_fk": {
+          "name": "sessions_race_id_races_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "races",
+          "columnsFrom": [
+            "race_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "sessions_session_type_id_session_types_id_fk": {
+          "name": "sessions_session_type_id_session_types_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "session_types",
+          "columnsFrom": [
+            "session_type_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "sessions_sequence_non_negative": {
+          "name": "sessions_sequence_non_negative",
+          "value": "\"sessions\".\"sequence\" >= 0"
+        },
+        "sessions_scheduled_laps_positive": {
+          "name": "sessions_scheduled_laps_positive",
+          "value": "\"sessions\".\"scheduled_laps\" IS NULL OR \"sessions\".\"scheduled_laps\" > 0"
+        },
+        "sessions_completed_laps_non_negative": {
+          "name": "sessions_completed_laps_non_negative",
+          "value": "\"sessions\".\"completed_laps\" IS NULL OR \"sessions\".\"completed_laps\" >= 0"
+        },
+        "sessions_completion_after_start": {
+          "name": "sessions_completion_after_start",
+          "value": "\"sessions\".\"completed_at\" IS NULL OR \"sessions\".\"actual_start\" IS NULL OR \"sessions\".\"completed_at\" >= \"sessions\".\"actual_start\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.status_codes": {
+      "name": "status_codes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "status_category",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_classified": {
+          "name": "is_classified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "status_codes_code_unique": {
+          "name": "status_codes_code_unique",
+          "columns": [
+            {
+              "expression": "code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "status_codes_code_not_blank": {
+          "name": "status_codes_code_not_blank",
+          "value": "char_length(trim(\"status_codes\".\"code\")) > 0"
+        },
+        "status_codes_description_not_blank": {
+          "name": "status_codes_description_not_blank",
+          "value": "char_length(trim(\"status_codes\".\"description\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.tire_compounds": {
+      "name": "tire_compounds",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_slick": {
+          "name": "is_slick",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "is_wet": {
+          "name": "is_wet",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "tire_compounds_code_unique": {
+          "name": "tire_compounds_code_unique",
+          "columns": [
+            {
+              "expression": "code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "tire_compounds_code_not_blank": {
+          "name": "tire_compounds_code_not_blank",
+          "value": "char_length(trim(\"tire_compounds\".\"code\")) > 0"
+        },
+        "tire_compounds_name_not_blank": {
+          "name": "tire_compounds_name_not_blank",
+          "value": "char_length(trim(\"tire_compounds\".\"name\")) > 0"
+        },
+        "tire_compounds_surface_type": {
+          "name": "tire_compounds_surface_type",
+          "value": "NOT (\"tire_compounds\".\"is_slick\" AND \"tire_compounds\".\"is_wet\")"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.event_status": {
+      "name": "event_status",
+      "schema": "public",
+      "values": [
+        "scheduled",
+        "in_progress",
+        "completed",
+        "cancelled",
+        "postponed",
+        "not_held"
+      ]
+    },
+    "public.import_run_status": {
+      "name": "import_run_status",
+      "schema": "public",
+      "values": [
+        "running",
+        "succeeded",
+        "failed",
+        "skipped"
+      ]
+    },
+    "public.status_category": {
+      "name": "status_category",
+      "schema": "public",
+      "values": [
+        "classified",
+        "retired",
+        "disqualified",
+        "not_started",
+        "not_classified",
+        "unknown"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

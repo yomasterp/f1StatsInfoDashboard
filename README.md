@@ -9,14 +9,16 @@ An unofficial, non-affiliated portfolio project for exploring Formula 1 history,
 - Node.js 24 or later
 - A local PostgreSQL server
 - A database named `f1_race_dashboard`
+- A NewsAPI developer key when using the optional news commands
 
 pgAdmin is only a database administration client. Create the local database through pgAdmin, then copy `.env.example` to `.env` and set a local connection string:
 
 ```env
 DATABASE_URL=postgresql://postgres:your-local-password@localhost:5432/f1_race_dashboard
+NEWS_API_KEY=your-local-newsapi-key
 ```
 
-Never commit `.env`; it is ignored by Git.
+Add the NewsAPI key only to the root `.env`. Never prefix it with `NEXT_PUBLIC_`, send it to browser code, or commit `.env`; the file is ignored by Git. The optional query, language, page-size, and base-URL settings are documented in `.env.example`.
 
 ### Install and run
 
@@ -43,6 +45,8 @@ The database is the application’s canonical data store. Pages will query it ra
 | `npm run db:check` | Verify the local PostgreSQL connection. |
 | `npm run db:generate` | Generate a migration after a schema change. |
 | `npm run db:migrate` | Apply committed migrations to the configured database. |
+| `npm run news:check` | Make one validated NewsAPI request and print up to five headline summaries without storing them. |
+| `npm run news:import` | Fetch, validate, normalize, and idempotently store NewsAPI article metadata. |
 
 ## Current database foundation
 
@@ -55,5 +59,16 @@ The race-weekend migration adds races and sessions. Races identify the season, r
 The race-results migration records each driver's official race classification, constructor, finishing status, grid and finishing positions, points, completed laps, race time or deficit, and fastest-lap details. Results link to a specific session and retain optional source/import identifiers so future ingestion can rerun deterministically without duplicating a driver in the same race classification.
 
 The qualifying-results migration keeps Q1, Q2, and Q3 best times separate from both the official qualifying classification and the final race-grid position. This preserves grid penalties and pit-lane starts without rewriting the qualifying result, while nullable phase times support historical formats and drivers who did not advance or set a time.
+
+The news-foundation migration adds normalized `news_sources` and `news_articles`. Article records contain discovery metadata and short descriptions, link to their publisher and import run, and are deduplicated by both canonical URL and provider record identifier. Full article bodies are intentionally discarded.
+
+To verify a key and import news after applying migrations:
+
+```powershell
+npm run news:check
+npm run news:import
+```
+
+Both commands run outside the Next.js request lifecycle. See `docs/news-foundation.md` for provider boundaries, configuration, and operational guidance.
 
 No Formula 1 source data has been imported yet. The future Jolpica and FastF1 workers will be separate from the Next.js request lifecycle, rerunnable, rate-limited, and idempotent.

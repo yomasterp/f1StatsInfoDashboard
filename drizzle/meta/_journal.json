@@ -43,6 +43,13 @@
       "when": 1787504550539,
       "tag": "0005_loving_silver_sable",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787510465458,
+      "tag": "0006_sprint_results",
+      "breakpoints": true
     }
   ]
 }

@@ -27,6 +27,7 @@ This document records standing project directions from the user. Review it befor
 - Record future user directives in this document and refer to them while working.
 - Give every newly added requirement and nested subrequirement a stable, descriptive identifier so branches, tests, and pull requests can reference it directly.
 - Keep news-provider credentials only in the root `.env`; commit placeholders and setup instructions, never real API keys.
+- Give every new migration a concise, descriptive name based on the schema change it contains; do not rename migration history after it has been merged or shared.
 
 ## Design and user experience
 

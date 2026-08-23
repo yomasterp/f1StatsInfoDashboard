@@ -67,6 +67,8 @@ The practice-results migration stores each driver's session classification, cons
 
 The driver- and constructor-standings migration records a snapshot after each scoring session. Each snapshot stores the ranked entrant, exact points, win count, optional countback evidence, and source/import provenance; the session reference makes sprint and race standings distinct without assuming every season follows the same weekend format.
 
+The driver- and constructor-championship-results migration stores each entrant's final official classification for a season. It keeps exact points, wins, optional countback evidence, and source/import provenance separate from session-by-session standings so historical pages can retrieve final tables without assuming a season ended with a standard race weekend.
+
 The news-foundation migration adds normalized `news_sources` and `news_articles`. Article records contain discovery metadata and short descriptions, link to their publisher and import run, and are deduplicated by both canonical URL and provider record identifier. Full article bodies are intentionally discarded.
 
 To verify a key and import news after applying migrations:

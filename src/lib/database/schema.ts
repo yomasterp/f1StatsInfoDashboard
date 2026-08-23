@@ -853,15 +853,19 @@ export const practiceResults = pgTable(
   ],
 );
 
+const championshipClassificationMetricsColumns = () => ({
+  position: integer("position").notNull(),
+  points: numeric("points", { precision: 8, scale: 3 }).notNull().default("0"),
+  wins: integer("wins").notNull().default(0),
+  countbackDetails: jsonb("countback_details"),
+});
+
 const championshipStandingColumns = () => ({
   id: bigserial("id", { mode: "number" }).primaryKey(),
   afterSessionId: integer("after_session_id")
     .notNull()
     .references(() => sessions.id, { onDelete: "restrict" }),
-  position: integer("position").notNull(),
-  points: numeric("points", { precision: 8, scale: 3 }).notNull().default("0"),
-  wins: integer("wins").notNull().default(0),
-  countbackDetails: jsonb("countback_details"),
+  ...championshipClassificationMetricsColumns(),
   ...importedRecordColumns(),
 });
 
@@ -931,6 +935,103 @@ export const constructorStandings = pgTable(
     check("constructor_standings_points_non_negative", sql`${table.points} >= 0`),
     check("constructor_standings_wins_non_negative", sql`${table.wins} >= 0`),
     ...sourceRecordChecks(table, "constructor_standings"),
+  ],
+);
+
+const championshipResultColumns = () => ({
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  seasonYear: integer("season_year")
+    .notNull()
+    .references(() => seasons.year, { onDelete: "restrict" }),
+  ...championshipClassificationMetricsColumns(),
+  ...importedRecordColumns(),
+});
+
+type ChampionshipResultColumns = {
+  seasonYear: PgColumn;
+  position: PgColumn;
+  importRunId: PgColumn;
+  source: PgColumn;
+  sourceIdentifier: PgColumn;
+};
+
+const championshipResultIndexes = (
+  table: ChampionshipResultColumns,
+  entrantId: PgColumn,
+  tableName: string,
+) => [
+  uniqueIndex(`${tableName}_season_entrant_unique`).on(
+    table.seasonYear,
+    entrantId,
+  ),
+  uniqueIndex(`${tableName}_source_identifier_unique`).on(
+    table.source,
+    table.sourceIdentifier,
+  ),
+  index(`${tableName}_season_position_idx`).on(table.seasonYear, table.position),
+  index(`${tableName}_entrant_season_idx`).on(entrantId, table.seasonYear),
+  index(`${tableName}_import_run_id_idx`).on(table.importRunId),
+];
+
+/** A driver's final official championship classification for one season. */
+export const driverChampionshipResults = pgTable(
+  "driver_championship_results",
+  {
+    ...championshipResultColumns(),
+    driverId: integer("driver_id")
+      .notNull()
+      .references(() => drivers.id, { onDelete: "restrict" }),
+  },
+  (table) => [
+    ...championshipResultIndexes(
+      table,
+      table.driverId,
+      "driver_championship_results",
+    ),
+    check(
+      "driver_championship_results_position_positive",
+      sql`${table.position} > 0`,
+    ),
+    check(
+      "driver_championship_results_points_non_negative",
+      sql`${table.points} >= 0`,
+    ),
+    check(
+      "driver_championship_results_wins_non_negative",
+      sql`${table.wins} >= 0`,
+    ),
+    ...sourceRecordChecks(table, "driver_championship_results"),
+  ],
+);
+
+/** A constructor's final official championship classification for one season. */
+export const constructorChampionshipResults = pgTable(
+  "constructor_championship_results",
+  {
+    ...championshipResultColumns(),
+    constructorId: integer("constructor_id")
+      .notNull()
+      .references(() => constructors.id, { onDelete: "restrict" }),
+  },
+  (table) => [
+    ...championshipResultIndexes(
+      table,
+      table.constructorId,
+      "constructor_championship_results",
+    ),
+    check(
+      "constructor_championship_results_position_positive",
+      sql`${table.position} > 0`,
+    ),
+    check(
+      "constructor_championship_results_points_non_negative",
+      sql`${table.points} >= 0`,
+    ),
+    check(
+      "constructor_championship_results_wins_non_negative",
+      sql`${table.wins} >= 0`,
+    ),
+    ...sourceRecordChecks(table, "constructor_championship_results"),
   ],
 );
 

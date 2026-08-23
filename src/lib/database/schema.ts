@@ -532,3 +532,114 @@ export const sessions = pgTable(
     ),
   ],
 );
+
+/** A driver's official classification and performance in a championship race session. */
+export const raceResults = pgTable(
+  "race_results",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    sessionId: integer("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "restrict" }),
+    driverId: integer("driver_id")
+      .notNull()
+      .references(() => drivers.id, { onDelete: "restrict" }),
+    constructorId: integer("constructor_id")
+      .notNull()
+      .references(() => constructors.id, { onDelete: "restrict" }),
+    statusCodeId: integer("status_code_id")
+      .notNull()
+      .references(() => statusCodes.id, { onDelete: "restrict" }),
+    gridPosition: integer("grid_position"),
+    finishPosition: integer("finish_position"),
+    classifiedPosition: integer("classified_position"),
+    points: numeric("points", { precision: 8, scale: 3 }).notNull().default("0"),
+    lapsCompleted: integer("laps_completed").notNull().default(0),
+    elapsedTimeMs: integer("elapsed_time_ms"),
+    timeBehindMs: integer("time_behind_ms"),
+    lapsBehind: integer("laps_behind"),
+    fastestLapRank: integer("fastest_lap_rank"),
+    fastestLapNumber: integer("fastest_lap_number"),
+    fastestLapTimeMs: integer("fastest_lap_time_ms"),
+    fastestLapAverageSpeedKph: numeric("fastest_lap_average_speed_kph", {
+      precision: 8,
+      scale: 3,
+    }),
+    fastestLapAwarded: boolean("fastest_lap_awarded").notNull().default(false),
+    importRunId: integer("import_run_id").references(() => importRuns.id, {
+      onDelete: "restrict",
+    }),
+    source: text("source"),
+    sourceIdentifier: text("source_identifier"),
+    importedAt: timestamp("imported_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("race_results_session_driver_unique").on(
+      table.sessionId,
+      table.driverId,
+    ),
+    uniqueIndex("race_results_source_identifier_unique").on(
+      table.source,
+      table.sourceIdentifier,
+    ),
+    index("race_results_session_classified_position_idx").on(
+      table.sessionId,
+      table.classifiedPosition,
+    ),
+    index("race_results_driver_session_idx").on(table.driverId, table.sessionId),
+    index("race_results_constructor_session_idx").on(
+      table.constructorId,
+      table.sessionId,
+    ),
+    index("race_results_status_code_id_idx").on(table.statusCodeId),
+    index("race_results_import_run_id_idx").on(table.importRunId),
+    check(
+      "race_results_grid_position_non_negative",
+      sql`${table.gridPosition} IS NULL OR ${table.gridPosition} >= 0`,
+    ),
+    check(
+      "race_results_finish_position_positive",
+      sql`${table.finishPosition} IS NULL OR ${table.finishPosition} > 0`,
+    ),
+    check(
+      "race_results_classified_position_positive",
+      sql`${table.classifiedPosition} IS NULL OR ${table.classifiedPosition} > 0`,
+    ),
+    check("race_results_points_non_negative", sql`${table.points} >= 0`),
+    check("race_results_laps_completed_non_negative", sql`${table.lapsCompleted} >= 0`),
+    check(
+      "race_results_elapsed_time_ms_positive",
+      sql`${table.elapsedTimeMs} IS NULL OR ${table.elapsedTimeMs} > 0`,
+    ),
+    check(
+      "race_results_time_behind_ms_non_negative",
+      sql`${table.timeBehindMs} IS NULL OR ${table.timeBehindMs} >= 0`,
+    ),
+    check(
+      "race_results_laps_behind_positive",
+      sql`${table.lapsBehind} IS NULL OR ${table.lapsBehind} > 0`,
+    ),
+    check(
+      "race_results_fastest_lap_rank_positive",
+      sql`${table.fastestLapRank} IS NULL OR ${table.fastestLapRank} > 0`,
+    ),
+    check(
+      "race_results_fastest_lap_number_positive",
+      sql`${table.fastestLapNumber} IS NULL OR ${table.fastestLapNumber} > 0`,
+    ),
+    check(
+      "race_results_fastest_lap_time_ms_positive",
+      sql`${table.fastestLapTimeMs} IS NULL OR ${table.fastestLapTimeMs} > 0`,
+    ),
+    check(
+      "race_results_fastest_lap_average_speed_positive",
+      sql`${table.fastestLapAverageSpeedKph} IS NULL OR ${table.fastestLapAverageSpeedKph} > 0`,
+    ),
+    check(
+      "race_results_source_fields_paired",
+      sql`(${table.source} IS NULL AND ${table.sourceIdentifier} IS NULL) OR (${table.source} IS NOT NULL AND ${table.sourceIdentifier} IS NOT NULL AND ${hasNonBlankText(
+        table.source,
+      )} AND ${hasNonBlankText(table.sourceIdentifier)})`,
+    ),
+  ],
+);

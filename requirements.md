@@ -95,9 +95,9 @@
 
 ### 4.2 Race-weekend structure
 
-- [ ] Create `races`.
+- [x] Create `races`.
   - Stores season, round, circuit configuration, official title, dates, scheduled start, format, and cancellation/postponement state.
-- [ ] Create `sessions`.
+- [x] Create `sessions`.
   - Stores each practice, qualifying, sprint shootout, sprint, and race session separately, including planned/actual start and completion status.
 
 ### 4.3 Results and standings

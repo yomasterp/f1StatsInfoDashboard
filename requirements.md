@@ -52,9 +52,9 @@
 
 ### 2.4 News ingestion
 
-- [ ] **NEWS-INGEST-001:** Keep news ingestion separate from the Next.js request lifecycle.
-- [ ] **NEWS-INGEST-002:** Validate news-provider responses with Zod before normalization or storage.
-- [ ] **NEWS-INGEST-003:** Keep the news provider replaceable behind a typed provider interface.
+- [x] **NEWS-INGEST-001:** Keep news ingestion separate from the Next.js request lifecycle.
+- [x] **NEWS-INGEST-002:** Validate news-provider responses with Zod before normalization or storage.
+- [x] **NEWS-INGEST-003:** Keep the news provider replaceable behind a typed provider interface.
 
 ## 3. Data-source requirements
 
@@ -66,11 +66,11 @@
   - It supplies lap timing, sector timing, tires/stints, pit information, practice data, and related session details.
 - [ ] Use official/FIA information only as a verification reference for schedules, classifications, penalties, and corrections.
   - Do not scrape or ingest from F1 TV, Formula1.com live timing, livestreams, browser network calls, or unofficial reverse-engineered F1 TV endpoints.
-- [ ] **NEWS-SOURCE-001:** Use NewsData.io for deployed portfolio and preview article discovery under its applicable plan and terms.
+- [x] **NEWS-SOURCE-001:** Use NewsData.io for deployed portfolio and preview article discovery under its applicable plan and terms.
   - **NEWS-SOURCE-001.a:** Store article metadata and short provider-supplied descriptions only, preserve publisher attribution, and link readers to the original publisher.
   - **NEWS-SOURCE-001.b:** Do not store or display full article content or publisher imagery from NewsData.io unless the relevant rights are independently confirmed.
   - **NEWS-SOURCE-001.c:** Keep NewsData.io credentials server-side and account for the free plan's delayed results and request quota.
-- [ ] **NEWS-SOURCE-002:** Retain NewsAPI only as an optional local-development provider under its applicable plan and terms.
+- [x] **NEWS-SOURCE-002:** Retain NewsAPI only as an optional local-development provider under its applicable plan and terms.
 
 ### 3.2 Provenance and import history
 
@@ -148,9 +148,9 @@
 
 ### 4.6 News metadata
 
-- [ ] **NEWS-DATA-001:** Create `news_sources` and `news_articles`.
+- [x] **NEWS-DATA-001:** Create `news_sources` and `news_articles`.
   - **NEWS-DATA-001.a:** Store normalized publishers, canonical article URLs, headlines, short descriptions, publication timestamps, import provenance, and freshness timestamps.
-- [ ] **NEWS-DATA-002:** Deduplicate news by canonical URL and stable provider record identifier.
+- [x] **NEWS-DATA-002:** Deduplicate news by canonical URL and stable provider record identifier.
 
 ### 4.7 Integrity and performance
 
@@ -184,9 +184,9 @@
 
 ### 5.4 News refresh
 
-- [ ] **NEWS-REFRESH-001:** Provide a rerunnable command that imports Formula 1 article metadata from the configured news provider.
+- [x] **NEWS-REFRESH-001:** Provide a rerunnable command that imports Formula 1 article metadata from the configured news provider.
 - [ ] **NEWS-REFRESH-002:** Refresh news on a quota-aware schedule and surface the last successful refresh time.
-- [ ] **NEWS-REFRESH-003:** Record news-import success, failure, counts, duration, and sanitized errors without logging API credentials.
+- [x] **NEWS-REFRESH-003:** Record news-import success, failure, counts, duration, and sanitized errors without logging API credentials.
 
 ## 6. User-interface requirements
 
@@ -308,7 +308,7 @@
 - [ ] Identify the application as an unofficial, non-affiliated portfolio project.
 - [ ] Do not use F1 logos, official fonts, copyrighted video, team artwork, or branding that suggests F1 endorsement without permission.
 - [ ] Follow each data provider's terms, attribution, rate-limit, and storage requirements.
-- [ ] **NEWS-LEGAL-001:** Do not reproduce full news articles or use publisher imagery unless the provider and publisher permit that use.
+- [x] **NEWS-LEGAL-001:** Do not reproduce full news articles or use publisher imagery unless the provider and publisher permit that use.
 
 ## 11. Completion milestones
 

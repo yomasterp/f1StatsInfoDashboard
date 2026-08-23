@@ -61,6 +61,8 @@ The race-results migration records each driver's official race classification, c
 
 The qualifying-results migration keeps Q1, Q2, and Q3 best times separate from both the official qualifying classification and the final race-grid position. This preserves grid penalties and pit-lane starts without rewriting the qualifying result, while nullable phase times support historical formats and drivers who did not advance or set a time.
 
+The sprint-results migration stores each driver's grid, finish and classified positions, constructor, status, exact points, completed laps, timing or lap deficits, and optional fastest-lap details for a sprint session. It does not hard-code a scoring distribution, so historical and future sprint formats can use the points system applicable to their season.
+
 The news-foundation migration adds normalized `news_sources` and `news_articles`. Article records contain discovery metadata and short descriptions, link to their publisher and import run, and are deduplicated by both canonical URL and provider record identifier. Full article bodies are intentionally discarded.
 
 To verify a key and import news after applying migrations:

@@ -9,6 +9,7 @@ import {
   numeric,
   pgEnum,
   pgTable,
+  type PgColumn,
   text,
   timestamp,
   uniqueIndex,
@@ -585,6 +586,57 @@ const classificationResultColumns = () => ({
   importedAt: timestamp("imported_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+const sessionSummaryResultColumns = () => ({
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  sessionId: integer("session_id")
+    .notNull()
+    .references(() => sessions.id, { onDelete: "restrict" }),
+  driverId: integer("driver_id")
+    .notNull()
+    .references(() => drivers.id, { onDelete: "restrict" }),
+  constructorId: integer("constructor_id")
+    .notNull()
+    .references(() => constructors.id, { onDelete: "restrict" }),
+  statusCodeId: integer("status_code_id").references(() => statusCodes.id, {
+    onDelete: "restrict",
+  }),
+  importRunId: integer("import_run_id").references(() => importRuns.id, {
+    onDelete: "restrict",
+  }),
+  source: text("source"),
+  sourceIdentifier: text("source_identifier"),
+  importedAt: timestamp("imported_at", { withTimezone: true }).notNull().defaultNow(),
+  notes: text("notes"),
+});
+
+type ResultLookupColumns = {
+  sessionId: PgColumn;
+  driverId: PgColumn;
+  constructorId: PgColumn;
+  statusCodeId: PgColumn;
+  importRunId: PgColumn;
+  source: PgColumn;
+  sourceIdentifier: PgColumn;
+};
+
+const resultLookupIndexes = (table: ResultLookupColumns, tableName: string) => [
+  uniqueIndex(`${tableName}_session_driver_unique`).on(
+    table.sessionId,
+    table.driverId,
+  ),
+  uniqueIndex(`${tableName}_source_identifier_unique`).on(
+    table.source,
+    table.sourceIdentifier,
+  ),
+  index(`${tableName}_driver_session_idx`).on(table.driverId, table.sessionId),
+  index(`${tableName}_constructor_session_idx`).on(
+    table.constructorId,
+    table.sessionId,
+  ),
+  index(`${tableName}_status_code_id_idx`).on(table.statusCodeId),
+  index(`${tableName}_import_run_id_idx`).on(table.importRunId),
+];
+
 /** A driver's official classification and performance in a championship race session. */
 export const raceResults = pgTable(
   "race_results",
@@ -592,25 +644,11 @@ export const raceResults = pgTable(
     ...classificationResultColumns(),
   },
   (table) => [
-    uniqueIndex("race_results_session_driver_unique").on(
-      table.sessionId,
-      table.driverId,
-    ),
-    uniqueIndex("race_results_source_identifier_unique").on(
-      table.source,
-      table.sourceIdentifier,
-    ),
+    ...resultLookupIndexes(table, "race_results"),
     index("race_results_session_classified_position_idx").on(
       table.sessionId,
       table.classifiedPosition,
     ),
-    index("race_results_driver_session_idx").on(table.driverId, table.sessionId),
-    index("race_results_constructor_session_idx").on(
-      table.constructorId,
-      table.sessionId,
-    ),
-    index("race_results_status_code_id_idx").on(table.statusCodeId),
-    index("race_results_import_run_id_idx").on(table.importRunId),
     check(
       "race_results_grid_position_non_negative",
       sql`${table.gridPosition} IS NULL OR ${table.gridPosition} >= 0`,
@@ -661,55 +699,19 @@ export const raceResults = pgTable(
 export const qualifyingResults = pgTable(
   "qualifying_results",
   {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-    sessionId: integer("session_id")
-      .notNull()
-      .references(() => sessions.id, { onDelete: "restrict" }),
-    driverId: integer("driver_id")
-      .notNull()
-      .references(() => drivers.id, { onDelete: "restrict" }),
-    constructorId: integer("constructor_id")
-      .notNull()
-      .references(() => constructors.id, { onDelete: "restrict" }),
-    statusCodeId: integer("status_code_id").references(() => statusCodes.id, {
-      onDelete: "restrict",
-    }),
+    ...sessionSummaryResultColumns(),
     qualifyingPosition: integer("qualifying_position"),
     finalGridPosition: integer("final_grid_position"),
     q1TimeMs: integer("q1_time_ms"),
     q2TimeMs: integer("q2_time_ms"),
     q3TimeMs: integer("q3_time_ms"),
-    importRunId: integer("import_run_id").references(() => importRuns.id, {
-      onDelete: "restrict",
-    }),
-    source: text("source"),
-    sourceIdentifier: text("source_identifier"),
-    importedAt: timestamp("imported_at", { withTimezone: true }).notNull().defaultNow(),
-    notes: text("notes"),
   },
   (table) => [
-    uniqueIndex("qualifying_results_session_driver_unique").on(
-      table.sessionId,
-      table.driverId,
-    ),
-    uniqueIndex("qualifying_results_source_identifier_unique").on(
-      table.source,
-      table.sourceIdentifier,
-    ),
+    ...resultLookupIndexes(table, "qualifying_results"),
     index("qualifying_results_session_position_idx").on(
       table.sessionId,
       table.qualifyingPosition,
     ),
-    index("qualifying_results_driver_session_idx").on(
-      table.driverId,
-      table.sessionId,
-    ),
-    index("qualifying_results_constructor_session_idx").on(
-      table.constructorId,
-      table.sessionId,
-    ),
-    index("qualifying_results_status_code_id_idx").on(table.statusCodeId),
-    index("qualifying_results_import_run_id_idx").on(table.importRunId),
     check(
       "qualifying_results_position_positive",
       sql`${table.qualifyingPosition} IS NULL OR ${table.qualifyingPosition} > 0`,
@@ -749,25 +751,11 @@ export const sprintResults = pgTable(
     ...classificationResultColumns(),
   },
   (table) => [
-    uniqueIndex("sprint_results_session_driver_unique").on(
-      table.sessionId,
-      table.driverId,
-    ),
-    uniqueIndex("sprint_results_source_identifier_unique").on(
-      table.source,
-      table.sourceIdentifier,
-    ),
+    ...resultLookupIndexes(table, "sprint_results"),
     index("sprint_results_session_classified_position_idx").on(
       table.sessionId,
       table.classifiedPosition,
     ),
-    index("sprint_results_driver_session_idx").on(table.driverId, table.sessionId),
-    index("sprint_results_constructor_session_idx").on(
-      table.constructorId,
-      table.sessionId,
-    ),
-    index("sprint_results_status_code_id_idx").on(table.statusCodeId),
-    index("sprint_results_import_run_id_idx").on(table.importRunId),
     check(
       "sprint_results_grid_position_non_negative",
       sql`${table.gridPosition} IS NULL OR ${table.gridPosition} >= 0`,
@@ -814,6 +802,55 @@ export const sprintResults = pgTable(
       sql`${table.fastestLapAverageSpeedKph} IS NULL OR ${table.fastestLapAverageSpeedKph} > 0`,
     ),
     ...sourceRecordChecks(table, "sprint_results"),
+  ],
+);
+
+/** A driver's classification and best-lap summary in a practice session. */
+export const practiceResults = pgTable(
+  "practice_results",
+  {
+    ...sessionSummaryResultColumns(),
+    classificationPosition: integer("classification_position"),
+    bestLapTimeMs: integer("best_lap_time_ms"),
+    bestLapNumber: integer("best_lap_number"),
+    gapToLeaderMs: integer("gap_to_leader_ms"),
+    lapsCompleted: integer("laps_completed").notNull().default(0),
+  },
+  (table) => [
+    ...resultLookupIndexes(table, "practice_results"),
+    index("practice_results_session_position_idx").on(
+      table.sessionId,
+      table.classificationPosition,
+    ),
+    check(
+      "practice_results_position_positive",
+      sql`${table.classificationPosition} IS NULL OR ${table.classificationPosition} > 0`,
+    ),
+    check(
+      "practice_results_best_lap_time_positive",
+      sql`${table.bestLapTimeMs} IS NULL OR ${table.bestLapTimeMs} > 0`,
+    ),
+    check(
+      "practice_results_best_lap_number_positive",
+      sql`${table.bestLapNumber} IS NULL OR ${table.bestLapNumber} > 0`,
+    ),
+    check(
+      "practice_results_gap_to_leader_non_negative",
+      sql`${table.gapToLeaderMs} IS NULL OR ${table.gapToLeaderMs} >= 0`,
+    ),
+    check(
+      "practice_results_laps_completed_non_negative",
+      sql`${table.lapsCompleted} >= 0`,
+    ),
+    check(
+      "practice_results_best_lap_number_requires_time",
+      sql`${table.bestLapNumber} IS NULL OR ${table.bestLapTimeMs} IS NOT NULL`,
+    ),
+    check(
+      "practice_results_gap_requires_time",
+      sql`${table.gapToLeaderMs} IS NULL OR ${table.bestLapTimeMs} IS NOT NULL`,
+    ),
+    ...sourceRecordChecks(table, "practice_results"),
   ],
 );
 

@@ -9,16 +9,17 @@ An unofficial, non-affiliated portfolio project for exploring Formula 1 history,
 - Node.js 24 or later
 - A local PostgreSQL server
 - A database named `f1_race_dashboard`
-- A NewsAPI developer key when using the optional news commands
+- A NewsData.io key when using the default news commands
 
 pgAdmin is only a database administration client. Create the local database through pgAdmin, then copy `.env.example` to `.env` and set a local connection string:
 
 ```env
 DATABASE_URL=postgresql://postgres:your-local-password@localhost:5432/f1_race_dashboard
-NEWS_API_KEY=your-local-newsapi-key
+NEWS_PROVIDER=newsdata
+NEWSDATA_API_KEY=your-newsdata-key
 ```
 
-Add the NewsAPI key only to the root `.env`. Never prefix it with `NEXT_PUBLIC_`, send it to browser code, or commit `.env`; the file is ignored by Git. The optional query, language, page-size, and base-URL settings are documented in `.env.example`.
+Add the NewsData.io key only to the root `.env`. Never prefix it with `NEXT_PUBLIC_`, send it to browser code, or commit `.env`; the file is ignored by Git. The optional query, language, category, and base-URL settings are documented in `.env.example`. NewsAPI remains available only as an explicitly selected local-development provider.
 
 ### Install and run
 
@@ -45,8 +46,8 @@ The database is the application’s canonical data store. Pages will query it ra
 | `npm run db:check` | Verify the local PostgreSQL connection. |
 | `npm run db:generate` | Generate a migration after a schema change. |
 | `npm run db:migrate` | Apply committed migrations to the configured database. |
-| `npm run news:check` | Make one validated NewsAPI request and print up to five headline summaries without storing them. |
-| `npm run news:import` | Fetch, validate, normalize, and idempotently store NewsAPI article metadata. |
+| `npm run news:check` | Make one validated request to the selected news provider and print up to five headline summaries without storing them. |
+| `npm run news:import` | Fetch, validate, normalize, and idempotently store article metadata from the selected news provider. |
 
 ## Current database foundation
 

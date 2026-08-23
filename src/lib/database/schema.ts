@@ -737,3 +737,97 @@ export const qualifyingResults = pgTable(
     ...sourceRecordChecks(table, "qualifying_results"),
   ],
 );
+
+/** A normalized publisher discovered through a configured news metadata provider. */
+export const newsSources = pgTable(
+  "news_sources",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    provider: text("provider").notNull(),
+    providerSourceIdentifier: text("provider_source_identifier"),
+    name: text("name").notNull(),
+    domain: text("domain").notNull(),
+    homepageUrl: text("homepage_url").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("news_sources_provider_domain_unique").on(
+      table.provider,
+      table.domain,
+    ),
+    uniqueIndex("news_sources_provider_identifier_unique").on(
+      table.provider,
+      table.providerSourceIdentifier,
+    ),
+    check("news_sources_provider_not_blank", hasNonBlankText(table.provider)),
+    check("news_sources_name_not_blank", hasNonBlankText(table.name)),
+    check("news_sources_domain_not_blank", hasNonBlankText(table.domain)),
+    check("news_sources_domain_lowercase", sql`${table.domain} = lower(${table.domain})`),
+    check("news_sources_homepage_url_not_blank", hasNonBlankText(table.homepageUrl)),
+    check(
+      "news_sources_provider_identifier_not_blank",
+      sql`${table.providerSourceIdentifier} IS NULL OR ${hasNonBlankText(
+        table.providerSourceIdentifier,
+      )}`,
+    ),
+  ],
+);
+
+/** Licensed article metadata; full publisher article bodies are intentionally not stored. */
+export const newsArticles = pgTable(
+  "news_articles",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    newsSourceId: integer("news_source_id")
+      .notNull()
+      .references(() => newsSources.id, { onDelete: "restrict" }),
+    provider: text("provider").notNull(),
+    providerRecordIdentifier: text("provider_record_identifier").notNull(),
+    canonicalUrl: text("canonical_url").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary"),
+    author: text("author"),
+    imageUrl: text("image_url"),
+    language: text("language").notNull().default("en"),
+    publishedAt: timestamp("published_at", { withTimezone: true }).notNull(),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    importRunId: integer("import_run_id")
+      .notNull()
+      .references(() => importRuns.id, { onDelete: "restrict" }),
+  },
+  (table) => [
+    uniqueIndex("news_articles_canonical_url_unique").on(table.canonicalUrl),
+    uniqueIndex("news_articles_provider_record_unique").on(
+      table.provider,
+      table.providerRecordIdentifier,
+    ),
+    index("news_articles_published_at_idx").on(table.publishedAt),
+    index("news_articles_source_published_at_idx").on(
+      table.newsSourceId,
+      table.publishedAt,
+    ),
+    index("news_articles_import_run_id_idx").on(table.importRunId),
+    check("news_articles_provider_not_blank", hasNonBlankText(table.provider)),
+    check(
+      "news_articles_provider_record_identifier_not_blank",
+      hasNonBlankText(table.providerRecordIdentifier),
+    ),
+    check("news_articles_canonical_url_not_blank", hasNonBlankText(table.canonicalUrl)),
+    check("news_articles_title_not_blank", hasNonBlankText(table.title)),
+    check(
+      "news_articles_language_code",
+      sql`char_length(${table.language}) = 2 AND ${table.language} = lower(${table.language})`,
+    ),
+    check(
+      "news_articles_seen_range",
+      sql`${table.lastSeenAt} >= ${table.firstSeenAt}`,
+    ),
+  ],
+);

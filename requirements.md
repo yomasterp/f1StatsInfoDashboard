@@ -22,6 +22,8 @@
 - [ ] Provide a historical results explorer for drivers, constructors, races, circuits, and seasons.
 - [ ] Provide driver and constructor comparison tools.
 - [ ] Provide driver and constructor championship scenarios with automatic mathematical elimination.
+- [ ] **NEWS-PRODUCT-001:** Provide a curated Formula 1 news section sourced through a licensed metadata API.
+  - **NEWS-PRODUCT-001.a:** Show publisher attribution and link to the original article rather than reproducing full copyrighted articles.
 
 ## 2. Technology requirements
 
@@ -48,6 +50,12 @@
   - Required secrets and connection strings must never be committed to source control.
 - [ ] Use database seed/import commands that work on a clean local machine.
 
+### 2.4 News ingestion
+
+- [ ] **NEWS-INGEST-001:** Keep news ingestion separate from the Next.js request lifecycle.
+- [ ] **NEWS-INGEST-002:** Validate news-provider responses with Zod before normalization or storage.
+- [ ] **NEWS-INGEST-003:** Keep the news provider replaceable behind a typed provider interface.
+
 ## 3. Data-source requirements
 
 ### 3.1 Source roles
@@ -58,6 +66,11 @@
   - It supplies lap timing, sector timing, tires/stints, pit information, practice data, and related session details.
 - [ ] Use official/FIA information only as a verification reference for schedules, classifications, penalties, and corrections.
   - Do not scrape or ingest from F1 TV, Formula1.com live timing, livestreams, browser network calls, or unofficial reverse-engineered F1 TV endpoints.
+- [ ] **NEWS-SOURCE-001:** Use NewsData.io for deployed portfolio and preview article discovery under its applicable plan and terms.
+  - **NEWS-SOURCE-001.a:** Store article metadata and short provider-supplied descriptions only, preserve publisher attribution, and link readers to the original publisher.
+  - **NEWS-SOURCE-001.b:** Do not store or display full article content or publisher imagery from NewsData.io unless the relevant rights are independently confirmed.
+  - **NEWS-SOURCE-001.c:** Keep NewsData.io credentials server-side and account for the free plan's delayed results and request quota.
+- [ ] **NEWS-SOURCE-002:** Retain NewsAPI only as an optional local-development provider under its applicable plan and terms.
 
 ### 3.2 Provenance and import history
 
@@ -104,7 +117,7 @@
 
 - [x] Create `race_results`.
   - Stores grid position, classified and finishing positions, points, laps completed, time/laps behind, fastest-lap fields, driver, constructor, and status.
-- [ ] Create `qualifying_results`.
+- [x] Create `qualifying_results`.
   - Stores Q1, Q2, Q3, qualifying position, and final grid position separately because penalties can change the grid.
 - [ ] Create `sprint_results`.
   - Must support seasons with no sprint events and evolving sprint formats.
@@ -133,7 +146,13 @@
 - [ ] Reserve schema space for `session_intervals`.
   - Interval/gap snapshots are deferred because they are high-volume and have limited historical coverage.
 
-### 4.6 Integrity and performance
+### 4.6 News metadata
+
+- [ ] **NEWS-DATA-001:** Create `news_sources` and `news_articles`.
+  - **NEWS-DATA-001.a:** Store normalized publishers, canonical article URLs, headlines, short descriptions, publication timestamps, import provenance, and freshness timestamps.
+- [ ] **NEWS-DATA-002:** Deduplicate news by canonical URL and stable provider record identifier.
+
+### 4.7 Integrity and performance
 
 - [ ] Use foreign keys, unique constraints, and check constraints for relational integrity.
 - [ ] Add indexes for the queries used by pages and charts.
@@ -162,6 +181,12 @@
 - [ ] Prevent concurrent imports of the same session.
 - [ ] Retry transient source failures with bounded retries and useful logs.
 - [ ] Surface stale-data status in the admin/import view.
+
+### 5.4 News refresh
+
+- [ ] **NEWS-REFRESH-001:** Provide a rerunnable command that imports Formula 1 article metadata from the configured news provider.
+- [ ] **NEWS-REFRESH-002:** Refresh news on a quota-aware schedule and surface the last successful refresh time.
+- [ ] **NEWS-REFRESH-003:** Record news-import success, failure, counts, duration, and sanitized errors without logging API credentials.
 
 ## 6. User-interface requirements
 
@@ -197,6 +222,12 @@
   - Compare wins, podiums, poles, points, starts, DNFs, average grid position, and average finish.
 - [ ] Support constructor-versus-constructor comparisons.
 - [ ] Support filters for career, season, circuit, era, and teammate-overlap periods where applicable.
+
+### 6.6 News
+
+- [ ] **NEWS-UI-001:** Provide a responsive `/news` page with publisher, publication time, headline, summary, and an external link to the original article.
+- [ ] **NEWS-UI-002:** Provide publisher and date filters plus loading, empty, error, and stale-data states.
+- [ ] **NEWS-UI-003:** Add a compact latest-news section to the current-season home page.
 
 ## 7. Visualization requirements
 
@@ -247,6 +278,7 @@
 ### 9.1 Read APIs
 
 - [ ] Provide typed endpoints or server-side query functions for seasons, calendar, races, results, standings, profiles, comparisons, charts, and scenarios.
+- [ ] **NEWS-API-001:** Provide typed server-side query functions for news lists, filters, and freshness metadata.
 - [ ] Support filtering and pagination for high-cardinality lists.
 - [ ] Return explicit availability metadata with detailed-session responses.
 
@@ -276,6 +308,7 @@
 - [ ] Identify the application as an unofficial, non-affiliated portfolio project.
 - [ ] Do not use F1 logos, official fonts, copyrighted video, team artwork, or branding that suggests F1 endorsement without permission.
 - [ ] Follow each data provider's terms, attribution, rate-limit, and storage requirements.
+- [ ] **NEWS-LEGAL-001:** Do not reproduce full news articles or use publisher imagery unless the provider and publisher permit that use.
 
 ## 11. Completion milestones
 
@@ -285,3 +318,4 @@
 - [ ] **Milestone 4 — Championship engine:** driver/constructor scenarios, elimination logic, and historical tests.
 - [ ] **Milestone 5 — Session analytics:** 2018+ FastF1 worker, lap/pit/stint/position tables, and race visualizations.
 - [ ] **Milestone 6 — Current-season operations:** scheduled post-session imports, correction refreshes, stale-data handling, and project polish.
+- [ ] **NEWS-MILESTONE-001 — News:** licensed news ingestion, normalized article metadata, scheduled refreshes, and the news interface.

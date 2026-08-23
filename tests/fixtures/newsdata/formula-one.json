@@ -1,0 +1,35 @@
+{
+  "status": "success",
+  "totalResults": 2,
+  "results": [
+    {
+      "article_id": "newsdata-f1-001",
+      "title": "Formula 1 team reveals its next development package",
+      "link": "https://news.example.com/f1/development-package?utm_source=feed&ref=home",
+      "creator": ["Alex Reporter", "Sam Editor"],
+      "description": "A short provider-supplied summary of the Formula 1 report.",
+      "content": "Full article content that must never be retained by the application.",
+      "pubDate": "2026-08-22 18:30:00",
+      "image_url": "https://news.example.com/images/development-package.jpg",
+      "source_id": "example_motorsport",
+      "source_name": "Example Motorsport",
+      "source_url": "https://news.example.com/latest",
+      "language": "english"
+    },
+    {
+      "article_id": "newsdata-f1-002",
+      "title": "Race weekend analysis",
+      "link": "https://racing.example.org/analysis/weekend/#overview",
+      "creator": null,
+      "description": null,
+      "content": null,
+      "pubDate": "2026-08-22T17:15:00Z",
+      "image_url": null,
+      "source_id": "racing_journal",
+      "source_name": "Racing Journal",
+      "source_url": null,
+      "language": "english"
+    }
+  ],
+  "nextPage": "next-page-token"
+}

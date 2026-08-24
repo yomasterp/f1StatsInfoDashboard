@@ -548,6 +548,16 @@ export const sessions = pgTable(
   ],
 );
 
+const sessionDriverRecordColumns = () => ({
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  sessionId: integer("session_id")
+    .notNull()
+    .references(() => sessions.id, { onDelete: "restrict" }),
+  driverId: integer("driver_id")
+    .notNull()
+    .references(() => drivers.id, { onDelete: "restrict" }),
+});
+
 const importedRecordColumns = () => ({
   importRunId: integer("import_run_id").references(() => importRuns.id, {
     onDelete: "restrict",
@@ -558,13 +568,7 @@ const importedRecordColumns = () => ({
 });
 
 const classificationResultColumns = () => ({
-  id: bigserial("id", { mode: "number" }).primaryKey(),
-  sessionId: integer("session_id")
-    .notNull()
-    .references(() => sessions.id, { onDelete: "restrict" }),
-  driverId: integer("driver_id")
-    .notNull()
-    .references(() => drivers.id, { onDelete: "restrict" }),
+  ...sessionDriverRecordColumns(),
   constructorId: integer("constructor_id")
     .notNull()
     .references(() => constructors.id, { onDelete: "restrict" }),
@@ -591,13 +595,7 @@ const classificationResultColumns = () => ({
 });
 
 const sessionSummaryResultColumns = () => ({
-  id: bigserial("id", { mode: "number" }).primaryKey(),
-  sessionId: integer("session_id")
-    .notNull()
-    .references(() => sessions.id, { onDelete: "restrict" }),
-  driverId: integer("driver_id")
-    .notNull()
-    .references(() => drivers.id, { onDelete: "restrict" }),
+  ...sessionDriverRecordColumns(),
   constructorId: integer("constructor_id")
     .notNull()
     .references(() => constructors.id, { onDelete: "restrict" }),
@@ -1032,6 +1030,84 @@ export const constructorChampionshipResults = pgTable(
       sql`${table.wins} >= 0`,
     ),
     ...sourceRecordChecks(table, "constructor_championship_results"),
+  ],
+);
+
+/** A driver's detailed lap record for a session where timing data is available. */
+export const lapTimes = pgTable(
+  "lap_times",
+  {
+    ...sessionDriverRecordColumns(),
+    lapNumber: integer("lap_number").notNull(),
+    lapTimeMs: integer("lap_time_ms"),
+    sector1TimeMs: integer("sector_1_time_ms"),
+    sector2TimeMs: integer("sector_2_time_ms"),
+    sector3TimeMs: integer("sector_3_time_ms"),
+    stintNumber: integer("stint_number"),
+    tireCompoundId: integer("tire_compound_id").references(() => tireCompounds.id, {
+      onDelete: "restrict",
+    }),
+    tireAgeLaps: integer("tire_age_laps"),
+    isFreshTire: boolean("is_fresh_tire"),
+    pitIn: boolean("pit_in"),
+    pitOut: boolean("pit_out"),
+    isDeleted: boolean("is_deleted").notNull().default(false),
+    deletedReason: text("deleted_reason"),
+    isAccurate: boolean("is_accurate"),
+    ...importedRecordColumns(),
+  },
+  (table) => [
+    uniqueIndex("lap_times_session_driver_lap_unique").on(
+      table.sessionId,
+      table.driverId,
+      table.lapNumber,
+    ),
+    uniqueIndex("lap_times_source_identifier_unique").on(
+      table.source,
+      table.sourceIdentifier,
+    ),
+    index("lap_times_session_lap_idx").on(table.sessionId, table.lapNumber),
+    index("lap_times_driver_session_lap_idx").on(
+      table.driverId,
+      table.sessionId,
+      table.lapNumber,
+    ),
+    index("lap_times_tire_compound_id_idx").on(table.tireCompoundId),
+    index("lap_times_import_run_id_idx").on(table.importRunId),
+    check("lap_times_lap_number_positive", sql`${table.lapNumber} > 0`),
+    check(
+      "lap_times_lap_time_positive",
+      sql`${table.lapTimeMs} IS NULL OR ${table.lapTimeMs} > 0`,
+    ),
+    check(
+      "lap_times_sector_1_time_positive",
+      sql`${table.sector1TimeMs} IS NULL OR ${table.sector1TimeMs} > 0`,
+    ),
+    check(
+      "lap_times_sector_2_time_positive",
+      sql`${table.sector2TimeMs} IS NULL OR ${table.sector2TimeMs} > 0`,
+    ),
+    check(
+      "lap_times_sector_3_time_positive",
+      sql`${table.sector3TimeMs} IS NULL OR ${table.sector3TimeMs} > 0`,
+    ),
+    check(
+      "lap_times_stint_number_positive",
+      sql`${table.stintNumber} IS NULL OR ${table.stintNumber} > 0`,
+    ),
+    check(
+      "lap_times_tire_age_laps_non_negative",
+      sql`${table.tireAgeLaps} IS NULL OR ${table.tireAgeLaps} >= 0`,
+    ),
+    check(
+      "lap_times_deleted_reason_not_blank",
+      sql`${table.deletedReason} IS NULL OR ${hasNonBlankText(table.deletedReason)}`,
+    ),
+    check(
+      "lap_times_deleted_reason_requires_deleted_lap",
+      sql`${table.deletedReason} IS NULL OR ${table.isDeleted}`,
+    ),
+    ...sourceRecordChecks(table, "lap_times"),
   ],
 );
 

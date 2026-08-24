@@ -69,6 +69,8 @@ The driver- and constructor-standings migration records a snapshot after each sc
 
 The driver- and constructor-championship-results migration stores each entrant's final official classification for a season. It keeps exact points, wins, optional countback evidence, and source/import provenance separate from session-by-session standings so historical pages can retrieve final tables without assuming a season ended with a standard race weekend.
 
+The lap-times migration stores one driver lap per session and lap number, including optional lap and sector durations, stint number, tire compound and age, freshness, pit-in/pit-out markers, accuracy, and deleted-lap context. Nullable detailed fields preserve unavailable FastF1-era data without representing it as a valid zero-value lap, while session/lap and driver/session/lap indexes support later charts.
+
 The news-foundation migration adds normalized `news_sources` and `news_articles`. Article records contain discovery metadata and short descriptions, link to their publisher and import run, and are deduplicated by both canonical URL and provider record identifier. Full article bodies are intentionally discarded.
 
 To verify a key and import news after applying migrations:

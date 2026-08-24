@@ -71,6 +71,13 @@
       "when": 1787523518436,
       "tag": "0009_driver_constructor_championship_results",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1787524580801,
+      "tag": "0010_lap_times",
+      "breakpoints": true
     }
   ]
 }

@@ -27,34 +27,39 @@
 
 ## 2. Technology requirements
 
-### 2.1 Application stack
+### 2.1 Application stack and boundaries
 
-- [x] Use Next.js and TypeScript for the web application.
-  - Use the App Router and server-side data fetching where it improves page performance and searchability.
-- [ ] Use PostgreSQL as the canonical application database.
-  - PostgreSQL must hold the normalized, queryable application dataset; the app must not depend on a public source API at page-render time.
-- [x] Use a typed database layer and migrations.
-  - Select one ORM/query layer, such as Prisma or Drizzle, and use migrations to make the schema reproducible.
-- [ ] Use Zod or equivalent runtime validation for external data and API input.
+- [x] Use Next.js and TypeScript for the web frontend.
+  - Use the App Router for routing, layouts, and the application shell. Most TypeScript/JavaScript that powers interactive pages, filters, charts, comparisons, and data refreshes must execute in the browser through client components.
+  - Browser code must call the Java backend's versioned HTTPS/REST API through a typed client; it must not connect directly to PostgreSQL, call data providers, or embed secrets. Server Components may be used sparingly for static shell, metadata, and SEO concerns, but must not become the primary application-data layer.
+- [ ] Provide a Java/Spring backend as the authoritative application service.
+  - Build a Java 21+ Spring Boot service that owns public REST endpoints, authentication/authorization boundaries if later introduced, business rules, ingestion orchestration, database access, caching, scheduled work, API error contracts, and OpenAPI documentation.
+  - The service must expose versioned, documented API contracts that the Next.js frontend consumes; do not duplicate business logic, SQL, or external-provider access in the frontend.
+- [ ] Use PostgreSQL as the canonical application database through the Java/Spring backend.
+  - PostgreSQL must hold the normalized, queryable application dataset; the frontend must not depend on a public source API or direct database access at page-render time.
+- [ ] Use a typed Java persistence layer and migrations.
+  - Select a Java persistence/query approach, such as Spring Data JPA or jOOQ, and a Java-managed migration tool such as Flyway or Liquibase. Preserve existing schema history through an explicit, reviewed transition plan; the Next.js frontend must not own SQL or database migrations.
+- [ ] Use runtime validation at every boundary.
+  - The Next.js frontend must validate API responses and user input with Zod or an equivalent TypeScript runtime schema. The Java/Spring backend must validate request DTOs and provider payloads with Jakarta Bean Validation and explicit mapper/contract validation before persistence.
 
 ### 2.2 Detailed-data ingestion
 
 - [ ] Run a dedicated ingestion worker for detailed session data.
-  - A small Python worker may use FastF1 because it provides session-oriented lap, tire, pit, and timing data; the user-facing app remains TypeScript.
-- [ ] Keep the ingestion process separate from the Next.js request lifecycle.
-  - Imports may take minutes, must be rerunnable, and must not block a user visiting the dashboard.
+  - A small Python worker may use FastF1 because it provides session-oriented lap, tire, pit, and timing data. It must be invoked or coordinated by the Java/Spring backend through a defined job/API boundary; the user-facing application remains a Next.js browser frontend.
+- [ ] Keep ingestion separate from the Next.js request lifecycle and normal Java API request threads.
+  - Imports may take minutes, must be rerunnable, and must not block a user visiting the dashboard or a request to the Java API.
 
 ### 2.3 Local development
 
-- [x] Provide a documented local setup with environment variables and database startup instructions.
+- [ ] Provide a documented local setup for the Next.js frontend, Java/Spring backend, and PostgreSQL database, including environment variables and startup instructions.
   - Required secrets and connection strings must never be committed to source control.
 - [ ] Use database seed/import commands that work on a clean local machine.
 
 ### 2.4 News ingestion
 
-- [x] **NEWS-INGEST-001:** Keep news ingestion separate from the Next.js request lifecycle.
-- [x] **NEWS-INGEST-002:** Validate news-provider responses with Zod before normalization or storage.
-- [x] **NEWS-INGEST-003:** Keep the news provider replaceable behind a typed provider interface.
+- [ ] **NEWS-INGEST-001:** Keep Java/Spring-managed news ingestion separate from the Next.js request lifecycle and normal Java API request threads.
+- [ ] **NEWS-INGEST-002:** Validate news-provider responses in the Java/Spring backend with explicit provider contract validation before normalization or storage; validate browser API responses with Zod or an equivalent TypeScript schema.
+- [ ] **NEWS-INGEST-003:** Keep the Java/Spring news provider replaceable behind a typed provider interface.
 
 ## 3. Data-source requirements
 
@@ -125,12 +130,12 @@
   - Stores session classification, best lap, laps completed, driver, and constructor for 2018+ sessions where data is available.
 - [x] Create `driver_standings` and `constructor_standings`.
   - Store standings after each relevant scoring event, not only final standings.
-- [ ] Create `driver_championship_results` and `constructor_championship_results`.
+- [x] Create `driver_championship_results` and `constructor_championship_results`.
   - Store each final season classification and season totals for fast historical pages.
 
 ### 4.4 Detailed-session tables
 
-- [ ] Create `lap_times` for 2018+.
+- [x] Create `lap_times` for 2018+.
   - Each row represents a driver lap and stores lap number, duration, sector times, stint number, tire fields, and pit-in/pit-out markers when available.
 - [ ] Create `lap_positions` for 2018+ race sessions.
   - Each row stores a driver's position at the end of a lap, enabling position-change charts.
@@ -184,7 +189,7 @@
 
 ### 5.4 News refresh
 
-- [x] **NEWS-REFRESH-001:** Provide a rerunnable command that imports Formula 1 article metadata from the configured news provider.
+- [ ] **NEWS-REFRESH-001:** Provide a Java/Spring-managed rerunnable command or job that imports Formula 1 article metadata from the configured news provider.
 - [ ] **NEWS-REFRESH-002:** Refresh news on a quota-aware schedule and surface the last successful refresh time.
 - [x] **NEWS-REFRESH-003:** Record news-import success, failure, counts, duration, and sanitized errors without logging API credentials.
 
@@ -277,8 +282,9 @@
 
 ### 9.1 Read APIs
 
-- [ ] Provide typed endpoints or server-side query functions for seasons, calendar, races, results, standings, profiles, comparisons, charts, and scenarios.
-- [ ] **NEWS-API-001:** Provide typed server-side query functions for news lists, filters, and freshness metadata.
+- [ ] Provide versioned, documented Java/Spring REST endpoints for seasons, calendar, races, results, standings, profiles, comparisons, charts, and scenarios.
+  - Publish OpenAPI contracts from the Spring service and generate or maintain a typed TypeScript client for browser use in Next.js. Keep pagination, filtering, availability metadata, and error envelopes consistent across endpoints.
+- [ ] **NEWS-API-001:** Provide typed Java/Spring REST endpoints for news lists, filters, and freshness metadata, consumed by the Next.js browser client.
 - [ ] Support filtering and pagination for high-cardinality lists.
 - [ ] Return explicit availability metadata with detailed-session responses.
 
@@ -292,10 +298,10 @@
 
 ### 10.1 Automated testing
 
-- [ ] Unit-test points calculations, standings accumulation, tie-break rules, normalizers, and data mappers.
-- [ ] Integration-test imports against fixture source responses.
-- [ ] Test database constraints and idempotent re-import behavior.
-- [ ] End-to-end test primary navigation: current season, historical season, race detail, comparison, and scenarios.
+- [ ] Unit-test Java points calculations, standings accumulation, tie-break rules, normalizers, mappers, and Spring service logic; unit-test TypeScript browser utilities, components, and API-client behavior where applicable.
+- [ ] Integration-test Java/Spring imports, REST contracts, and persistence against fixture source responses and an isolated PostgreSQL database.
+- [ ] Test database constraints and idempotent re-import behavior through the Java/Spring data-access layer.
+- [ ] End-to-end test primary navigation: current season, historical season, race detail, comparison, and scenarios against the Next.js frontend and Java API.
 
 ### 10.2 Documentation
 
@@ -312,7 +318,7 @@
 
 ## 11. Completion milestones
 
-- [ ] **Milestone 1 — Foundation:** Next.js app, PostgreSQL, schema migrations, local setup, and seed data.
+- [ ] **Milestone 1 — Foundation:** Next.js browser frontend, Java/Spring backend and REST contracts, PostgreSQL, schema migrations, local setup, and seed data.
 - [ ] **Milestone 2 — Historical core:** 1950–2026 core importer, validation report, season/race/standing pages.
 - [ ] **Milestone 3 — Profiles and comparison:** driver/constructor pages, comparison queries, and comparison charts.
 - [ ] **Milestone 4 — Championship engine:** driver/constructor scenarios, elimination logic, and historical tests.
